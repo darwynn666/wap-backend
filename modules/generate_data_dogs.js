@@ -9,8 +9,7 @@ const { dog_male_name, dog_female_name } = require("./name_src");
 const { getRandomInt, getRandomElement, getRandomDate } = require("./tools");
 
 //constants
-const CLOUDINARY_APP_PATH = "wap";
-const CLOUDINARY_DOGS_PATH = `${CLOUDINARY_APP_PATH}/dogs`;
+const {CLOUDINARY_DOGS_PATH} = require('./config')
 
 const generateDogsData = async (nbDogs) => {
   //delete all fakeData
@@ -105,8 +104,4 @@ const generateDogsData = async (nbDogs) => {
   else return ({ result: false, status: `error` });
 };
 
-const generateData = async (nbDogs) => {
-  return await generateDogsData(nbDogs);
-};
-
-module.exports = { generateData };
+module.exports = { generateDogsData };

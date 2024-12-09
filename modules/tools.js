@@ -18,19 +18,24 @@ const getRandomElement = (array) => {
 };
 
 function getRandomDate(nbYear) {
-    const now = new Date(); // Date actuelle
-    const sevenYearsAgo = new Date(); 
-    sevenYearsAgo.setFullYear(now.getFullYear() - nbYear); // Date d'il y a 7 ans
-  
-    // Convertir en timestamps
-    const nowTimestamp = now.getTime();
-    const sevenYearsAgoTimestamp = sevenYearsAgo.getTime();
-  
-    // Générer un timestamp aléatoire
-    const randomTimestamp = Math.random() * (nowTimestamp - sevenYearsAgoTimestamp) + sevenYearsAgoTimestamp;
-  
-    // Retourner une date à partir du timestamp
-    return new Date(randomTimestamp);
-  }
+  const now = new Date(); // Date actuelle
+  const sevenYearsAgo = new Date();
+  sevenYearsAgo.setFullYear(now.getFullYear() - nbYear); // Date d'il y a 7 ans
 
-module.exports = {getRandomInt,getRandomElement,getRandomDate}
+  // Convertir en timestamps
+  const nowTimestamp = now.getTime();
+  const sevenYearsAgoTimestamp = sevenYearsAgo.getTime();
+
+  // Générer un timestamp aléatoire
+  const randomTimestamp =
+    Math.random() * (nowTimestamp - sevenYearsAgoTimestamp) +
+    sevenYearsAgoTimestamp;
+
+  // Retourner une date à partir du timestamp
+  return new Date(randomTimestamp);
+}
+
+const removeAccents = (str) =>
+  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+module.exports = { getRandomInt, getRandomElement, getRandomDate ,removeAccents };
