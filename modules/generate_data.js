@@ -1,13 +1,13 @@
 //import
 const cloudinary = require("cloudinary").v2;
+const uid2 = require('uid2');
 
 const { dog_male_name, dog_female_name } = require("./name_src");
-const {getRandomInt, getRandomElement} = require('./tools')
+const { getRandomInt, getRandomElement,getRandomDate } = require("./tools");
 
 //constants
 const CLOUDINARY_APP_PATH = "wap";
 const CLOUDINARY_DOGS_PATH = `${CLOUDINARY_APP_PATH}/dogs`;
-
 
 const generateDogsData = async (nbDogs) => {
   console.log(`create ${nbDogs} dogs documents`);
@@ -16,47 +16,67 @@ const generateDogsData = async (nbDogs) => {
   const dogBreed = await cloudinary.api.sub_folders(CLOUDINARY_DOGS_PATH, {
     max_results: 500,
   });
-  const dogBreedAray = dogBreed.folders
-
-  const dogImagesByBreed = await (async (dogBreedAray) => {
+  // get the folders array
+  const dogBreedArray = dogBreed.folders;
+  //construct on objct with the breedName as key and array of pictures in value
+  const dogImagesByBreed = await (async (dogBreedArrayFolder) => {
     try {
-      let dogImagesByBreedTmp = {}
+      let dogImagesByBreedTmp = {};
       const responses = await Promise.all(
-        dogBreedAray.map(async breed =>{
+        dogBreedArray.map(async (breed) => {
           const breedImage = {};
           const Pictures = await cloudinary.api.resources_by_asset_folder(
             breed.path,
             { max_results: 500 }
           );
-          dogImagesByBreedTmp[breed.name] = Pictures.resources.map((x) => x.url);
+          dogImagesByBreedTmp[breed.name] = Pictures.resources.map(
+            (x) => x.url
+          );
         })
       );
-      return dogImagesByBreedTmp
+      return dogImagesByBreedTmp;
     } catch (error) {
-      console.error('Erreur dans le fetch :', error);
+      console.error("Erreur dans le fetch :", error);
     }
-  })(dogBreedAray)
+  })(dogBreedArray);
 
-  console.log(dogImagesByBreed)
+  //get the keys of the object
+  const breedName = Object.keys(dogImagesByBreed);
+  console.log(breedName);
 
   //
-  const dogSexRandom = getRandomElement(['male','female']);
+  const dogSexRandom = getRandomElement(["male", "female"]);
   const dogMaleNameRandom = getRandomElement(dog_male_name);
   const dogFemaleNameRandom = getRandomElement(dog_female_name);
-  const dogRaceRandom = getRandomElement(dog_female_name);
+  const dogRaceRandom = getRandomElement(breedName);
+  const statusArr=["","","","","","","","","","","","","malade","en chaleur","jeune","vieux","joueur"]
+  const dogStatusRandom = getRandomElement(statusArr);
 
   for (let i = 0; i < nbDogs; i++) {
     const dog = {};
     //random sex
     dog.sex = dogSexRandom();
     // get random name by sex
-    if (dog.sex==='male')
-      dog.name = dogMaleNameRandom();
-    else
-      dog.name = dogFemaleNameRandom();
+    if (dog.sex === "male") dog.name = dogMaleNameRandom();
+    else dog.name = dogFemaleNameRandom();
     //get the random breed
-    // dog.race = dogFemaleNameRandom();
-    // console.log(dog);
+    dog.race = dogRaceRandom();
+    //get a random photo
+    dog.photo =
+      dogImagesByBreed[dog.race][
+        getRandomInt(dogImagesByBreed[dog.race].length)
+      ];
+    //birthday
+    dog.birthday = getRandomDate(7)
+    //status
+    dog.status = dogStatusRandom()
+    //chipId
+    dog.chipId = uid2(6)
+    //isTaken with his owner
+    dog.isTaken = false
+    //isFalse 
+    dog.isFalse = true
+    console.log(dog);
   }
 };
 
