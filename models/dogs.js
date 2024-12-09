@@ -9,6 +9,7 @@ const dogsSchema = mongoose.Schema({
     status:String,
     chipid:String,
     isTaken:Boolean,
+    isFake: Boolean,
 });
 const Dog = mongoose.model('dogs', dogsSchema);
 

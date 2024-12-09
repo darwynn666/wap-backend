@@ -23,6 +23,7 @@ const placesSchema = mongoose.Schema({
     description:String,
     type: String,
     users:[{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    isFake: Boolean,
 });
 const Places = mongoose.model('places', placesSchema);
 

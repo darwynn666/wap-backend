@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
         });
        
         newdog.save().then(() => {
-            res.json({ result: true, Dog: data })
+            res.json({ result: true })
             console.log(Dog)
         })
 

@@ -19,7 +19,7 @@ const users_friendsSchema= mongoose.Schema({
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
 });
 
-const users_infosSchema= mongoose.Schema({
+const usersinfosSchema= mongoose.Schema({
     firstname: String,
     lastname: String,
     telephone: String,
@@ -30,13 +30,13 @@ const users_infosSchema= mongoose.Schema({
 })
 
 const usersSchema = mongoose.Schema({
-    name: String,
-    infos: users_infosSchema,
+    //name: String,
+    infos: usersinfosSchema,
     password: String,
     token: String,
     Status: String,
-    currentLocation:{type : pointSchema, require: true},
-    homeLocation:{type : pointSchema, required: true},
+    currentLocation:{type : pointSchema, required: false},
+    homeLocation:{type : pointSchema, required: false},
     dogs:[{type: mongoose.Schema.Types.ObjectId, ref: 'dogs' }],
     friends: [users_friendsSchema],
     isFake:Boolean,
