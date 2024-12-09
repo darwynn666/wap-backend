@@ -4,13 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('./models/connexion');
-const User= require('./models/users');
-const Places =require('./models/places');
-const Dog= require('./models/dogs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var dogsRouter = require('./routes/dogs')
+var dogsRouter = require('./routes/dogs');
+var placesRouter = require('./routes/places')
 var app = express();
 
 const cors = require('cors');
@@ -24,5 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/dogs', dogsRouter)
+app.use('/dogs', dogsRouter);
+app.use('/places', placesRouter);
 module.exports = app;
