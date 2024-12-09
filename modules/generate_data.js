@@ -16,9 +16,29 @@ const generateDogsData = async (nbDogs) => {
   const dogBreed = await cloudinary.api.sub_folders(CLOUDINARY_DOGS_PATH, {
     max_results: 500,
   });
+  const dogBreedAray = dogBreed.folders
 
-  const dogPhotosByBreed = {}
-  console.log(dogBreed)
+  const dogImagesByBreed = await (async (dogBreedAray) => {
+    try {
+      let dogImagesByBreedTmp = {}
+      const responses = await Promise.all(
+        dogBreedAray.map(async breed =>{
+          const breedImage = {};
+          const Pictures = await cloudinary.api.resources_by_asset_folder(
+            breed.path,
+            { max_results: 500 }
+          );
+          dogImagesByBreedTmp[breed.name] = Pictures.resources.map((x) => x.url);
+        })
+      );
+      return dogImagesByBreedTmp
+    } catch (error) {
+      console.error('Erreur dans le fetch :', error);
+    }
+  })(dogBreedAray)
+
+  console.log(dogImagesByBreed)
+
   //
   const dogSexRandom = getRandomElement(['male','female']);
   const dogMaleNameRandom = getRandomElement(dog_male_name);
@@ -36,7 +56,7 @@ const generateDogsData = async (nbDogs) => {
       dog.name = dogFemaleNameRandom();
     //get the random breed
     // dog.race = dogFemaleNameRandom();
-    console.log(dog);
+    // console.log(dog);
   }
 };
 
