@@ -3,6 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+require('./models/connexion');
+const User= require('./models/users');
+const Places =require('./models/places');
+const Dog= require('./models/dogs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
