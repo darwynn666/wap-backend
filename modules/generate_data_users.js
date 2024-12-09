@@ -2,7 +2,7 @@ const cloudinary = require("cloudinary").v2;
 const uid2 = require("uid2");
 const { CLOUDINARY_MEN_PATH, CLOUDINARY_WOMEN_PATH } = require("./config");
 const { lastname, womenFirstname, menFirstname } = require("./name_src");
-const { getRandomElement ,removeAccents,getRandomInt } = require("./tools");
+const { getRandomElement ,removeAccents,getRandomInt, getRandomLocationInFrance } = require("./tools");
 
 const getImagesUrl = async (cloudinaryFolders) => {
   try {
@@ -44,12 +44,18 @@ const generateUsersData = async (nbUsers) => {
     }
     infos.telephone = `06${getRandomInt(99999999)}`
     infos.email = `${removeAccents(infos.firstname).toLowerCase()}.${removeAccents(infos.lastname).toLowerCase()}@example.com`
+    const isDogSitter = [false,false,false,false,false,false,false,false,false,true]
+    infos.isDogSitter = isDogSitter[getRandomInt(isDogSitter.length)];
+    const isSearchingDogSitter = [false,false,false,false,true]
+    infos.isSearchingDogSitter = isSearchingDogSitter[getRandomInt(isSearchingDogSitter.length)]
     user.infos = infos
     user.password = uid2(24)
     user.token=uid2(32)
     const status=['off','walk','pause']
     user.status = status[getRandomInt(status.length)]
-    console.log(user);
+    console.log(await getRandomLocationInFrance())
+    user.currentLocation = await getRandomLocationInFrance()
+    // console.log(user);
   }
 };
 
