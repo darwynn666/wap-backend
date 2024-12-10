@@ -16,7 +16,7 @@ router.get('/users/:nbUsers', async (req, res) => {
   const nbUsers=req.params.nbUsers;
   const reponse = await generateUsersData(nbUsers);
   console.log('rep',reponse)
-  res.json({result:"under test"})
+  res.json(reponse)
 });
 
 module.exports = router;

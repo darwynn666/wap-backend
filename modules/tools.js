@@ -52,12 +52,11 @@ async function getRandomLocationInFrance() {
           // try to find
           const response = await fetch(`${apiUrl}?&limit=1&lat=${randomCoordinates.lat}&lon=${randomCoordinates.lon}`);
           const data = await response.json();
-          // console.log(data)
 
           // if find
           if (data.features && data.features.length > 0) {
               const feature = data.features[0]; // first result
-              return  feature.geometry;
+              return  feature;
           }
       } catch (error) {
           // console.error("Erreur lors de la requête à l'API :", error);
