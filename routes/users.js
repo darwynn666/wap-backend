@@ -32,11 +32,6 @@ router.post('/signup', (req, res) => {
 
       });
 
-      // const newDog = new Dog ({
-      //   name:req.body.name,
-      //   sex: req.body.sex,
-      // })
-
       newUser.save().then(newDoc => {
         res.json({ result: true, token: newDoc.token });
         console.log(newDoc)
@@ -50,10 +45,10 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/signin', (req, res) => {
-  if (!checkBody(req.body, [ 'email', 'password'])) {
+  if (!checkBody(req.body, ['email', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
-  } 
+  }
 
   User.findOne({ "infos.email": req.body.email }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
@@ -69,26 +64,43 @@ router.post('/checkmail', (req, res) => {
     if (data === null) {
       res.json({ result: false });
     } else {
-      res.json({ result: true});
+      res.json({ result: true });
       console.log(data)
     }
   });
 });
 
-router.get('/:token',(req, res) => {
-  User.findOne({'token':req.body.token}).then(data=>{
+router.get('/:token', (req, res) => {
+  User.findOne({ 'token': req.body.token }).then(data => {
     console.log(data)
-    if (data=== null) {
-      res.json({result: false,error: 'user not found'})
+    if (data === null) {
+      res.json({ result: false, error: 'user not found' })
     } else {
-      res.json({result: true, data})
+      res.json({ result: true, data })
     }
   });
 });
 
-router.put('/:token',(req, res) =>{
-
+router.put('/updateuser/:token', (req, res) => {
+  token = req.params.token;
+  const hash = bcrypt.hashSync(req.body.password, 10);
+  User.findOne({ token }).then(data => {
+   // console.log(data)
+    data.infos.firstname = req.body.firstname;
+    data.infos.lastname = req.body.lastname;
+    data.infos.email = req.body.email;
+    data.infos.telephone = req.body.telephone;
+    data.infos.photo = req.body.photo,
+      data.infos.isDogSitter = req.body.isDogSitter;
+    data.infos.isSearchingDogSitter = req.body.isSearchingDogSitter;
+    data.password = hash;
+    data.save().then(dataupdated => {
+      res.json({ result: true, message: "modifications effectuées", data: dataupdated })
+    })
+  })
 })
+
+
 
 
 

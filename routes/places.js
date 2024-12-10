@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
     });
 
     router.get('/',(req, res) => {
-        Places.findOne().then(data=>{
+        Places.find().then(data=>{
           console.log(data)
           if (data) {
             res.json({result: true,data})
