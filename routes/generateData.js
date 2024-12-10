@@ -24,7 +24,7 @@ router.get('/places/:nbPlaces', async (req, res) => {
   const nbPlaces=req.params.nbPlaces;
   const reponse = await generatePlacesData(nbPlaces);
   console.log('rep',reponse)
-  res.json({test:"test"})
+  res.json(reponse)
 });
 
 module.exports = router;

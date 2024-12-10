@@ -5,7 +5,12 @@ require("../models/connexion");
 const Places = require("../models/places");
 const User = require("../models/users");
 
-const {generateDescriptionRestaurant, generateDescriptionBar, generateDescriptionPark,genererDescriptionShops} = require('./description_generator')
+const {
+  generateDescriptionRestaurant,
+  generateDescriptionBar,
+  generateDescriptionPark,
+  genererDescriptionShops,
+} = require("./description_generator");
 
 const {
   restaurants_name,
@@ -56,7 +61,6 @@ const generatePlacesData = async (nbPlaces) => {
 
   //get the keys of the object
   const placeName = Object.keys(placesImagesByType);
-  console.log(placeName);
 
   const probabilitiesType = [
     "restaurants",
@@ -82,25 +86,32 @@ const generatePlacesData = async (nbPlaces) => {
 
   const location = await getRandomLocationInFrance();
 
+  let places = []
+
   for (let i = 0; i < nbPlaces; i++) {
+    console.log("create place "+i)
     const place = {};
     place.type = probabilitiesType[getRandomInt(probabilitiesType.length)];
     switch (place.type) {
       case "restaurants":
         place.name = restaurantsNameRandom();
-        place.description = generateDescriptionRestaurant()
+        place.description = generateDescriptionRestaurant();
+        break;
       case "bars":
         place.name = barsNameRandom();
         place.description = generateDescriptionBar();
+        break;
       case "parks":
         place.name = parksNameRandom();
         place.description = generateDescriptionPark();
+        break;
       case "garbages":
         place.name = "";
         place.description = "";
+        break;
       case "shops":
         place.name = shopsNameRandom();
-        place.description = genererDescriptionShops ();
+        place.description = genererDescriptionShops();
         break;
       default:
         console.log(`error of type`);
@@ -110,81 +121,37 @@ const generatePlacesData = async (nbPlaces) => {
         getRandomInt(placesImagesByType[place.type].length)
       ];
     place.location = location.geometry;
-    place.houseNumber = location.properties.houseNumber;
+    place.houseNumber = location.properties.housenumber;
     place.street = location.properties.street;
     place.postcode = location.properties.postcode;
     place.city = location.properties.city;
     place.isFake = true;
-    const probabilitiesUser = [0,0,1,1,1,1,2,2]
+    const probabilitiesUser = [0, 0, 1, 1, 1, 1, 2, 2];
     const placeUsers = [];
-    for (let i=0 ; i<probabilitiesUser[getRandomInt(probabilitiesUser.length)];i++ )
-    {
-        placeUsers.push(fakeUserRandom()._id)
+    for (
+      let i = 0;
+      i < probabilitiesUser[getRandomInt(probabilitiesUser.length)];
+      i++
+    ) {
+      const user = fakeUserRandom();
+      placeUsers.push(user._id);
+      //change user location
+      user.currentLocation = place.location;
+      const responseUser = await user.save();
     }
 
-    place.users = placeUsers
-    // console.log(location);
-    console.log(place);
+    place.users = placeUsers;
+    
+    places.push(place)
   }
-  //   const dogSexRandom = getRandomElement(["male", "female"]);
-  //   const dogMaleNameRandom = getRandomElement(dog_male_name);
-  //   const dogFemaleNameRandom = getRandomElement(dog_female_name);
-  //   const dogRaceRandom = getRandomElement(breedName);
-  //   const statusArr = [
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "",
-  //     "malade",
-  //     "en chaleur",
-  //     "jeune",
-  //     "vieux",
-  //     "joueur",
-  //   ];
-  //   const dogStatusRandom = getRandomElement(statusArr);
 
-  //   const dogs = [];
-  //   for (let i = 0; i < nbDogs; i++) {
-  //     const dog = {};
-  //     //random sex
-  //     dog.sex = dogSexRandom();
-  //     // get random name by sex
-  //     if (dog.sex === "male") dog.name = dogMaleNameRandom();
-  //     else dog.name = dogFemaleNameRandom();
-  //     //get the random breed
-  //     dog.race = dogRaceRandom();
-  //     //get a random photo
-  //     dog.photo =
-  //       dogImagesByBreed[dog.race][
-  //         getRandomInt(dogImagesByBreed[dog.race].length)
-  //       ];
-  //     //birthday
-  //     dog.birthday = getRandomDate(7);
-  //     //status
-  //     dog.status = dogStatusRandom();
-  //     //chipId
-  //     dog.chipId = uid2(6);
-  //     //isTaken with his owner
-  //     dog.isTaken = false;
-  //     //isFalse
-  //     dog.isFake = true;
-  //     dogs.push(dog);
-  //   }
   //insert in db
-  //   const response = await Dog.insertMany(dogs);
-  //   // console.log(response);
-  //   console.log("generate dogs Done");
-  //   if (response.length > 0)
-  //     return ({ result: true, status: `${response.length} dogs created in bdd` });
-  //   else return ({ result: false, status: `error` });
+  const response = await Places.insertMany(places);
+  // console.log(response);
+  console.log("generate places done");
+  if (response.length > 0)
+    return { result: true, status: `${response.length} places created in bdd` };
+  else return { result: false, status: `error` };
 };
 
 module.exports = { generatePlacesData };
