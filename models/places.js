@@ -15,7 +15,7 @@ const pointSchema = mongoose.Schema({
 const placesSchema = mongoose.Schema({
     name: String,
     photo: String,
-    houseNumber: Number,
+    houseNumber: String,
     street: String,
     postcode: Number,
     city: String,
