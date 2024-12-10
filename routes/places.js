@@ -5,7 +5,7 @@ require('../models/connexion');
 const Places = require('../models/places');
 
 router.post('/', (req, res) => {
-    console.log(req.body.location)
+   // console.log(req.body.location)
         const newplace = new Places({
             name: req.body.name,
             houseNumber: req.body.number,
@@ -25,5 +25,17 @@ router.post('/', (req, res) => {
             console.log(newplace);
         });
     });
+
+    router.get('/',(req, res) => {
+        Places.findOne().then(data=>{
+          console.log(data)
+          if (data) {
+            res.json({result: true,data})
+          } else {
+            res.json({result: false})
+          }
+        })
+      })
+      
 
     module.exports = router;
