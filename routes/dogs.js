@@ -26,10 +26,12 @@ router.post('/', (req, res) => {
             res.json({ result: true , data: newdog})
             console.log(Dog)
         })
-
-
         //   else {
         // res.json({ result: false, error: "veuillez saisir le nom" })
     })
 //});
+
+
+
+
 module.exports = router;
