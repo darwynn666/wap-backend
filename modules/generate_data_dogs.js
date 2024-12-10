@@ -30,7 +30,6 @@ const generateDogsData = async (nbDogs) => {
   let dogImagesByBreed = {};
   const responses = await Promise.all(
     dogBreedArray.map(async (breed) => {
-      const breedImage = {};
       const Pictures = await cloudinary.api.resources_by_asset_folder(
         breed.path,
         { max_results: 500 }
