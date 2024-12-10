@@ -84,11 +84,13 @@ const generatePlacesData = async (nbPlaces) => {
   const parksNameRandom = getRandomElement(parks_name);
   const shopsNameRandom = getRandomElement(shops_name);
 
-  const location = await getRandomLocationInFrance();
-
+  
   let places = []
-
+  
   for (let i = 0; i < nbPlaces; i++) {
+
+    const location = await getRandomLocationInFrance();
+    
     console.log("create place "+i)
     const place = {};
     place.type = probabilitiesType[getRandomInt(probabilitiesType.length)];
