@@ -100,7 +100,7 @@ const generateDogsData = async (nbDogs) => {
   // console.log(response);
   console.log("generate dogs Done");
   if (response.length > 0)
-    return ({ result: true, status: `${response.length} created in bdd` });
+    return ({ result: true, status: `${response.length} dogs created in bdd` });
   else return ({ result: false, status: `error` });
 };
 
