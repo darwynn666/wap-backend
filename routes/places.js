@@ -4,6 +4,7 @@ var router = express.Router();
 require('../models/connexion');
 const Places = require('../models/places');
 const { checkBody } = require('../modules/checkBody');
+const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 
 router.post('/', (req, res) => {
 
@@ -37,17 +38,27 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  const { lon, lat } = parseFloat(req.query)
-  if (lon && lat) {
-    console.log('filter', lon, lat)
 
+  const longitude = parseFloat(req.query.longitude)
+  const latitude = parseFloat(req.query.latitude)
+  const longitudeDelta = parseFloat(req.query.longitudeDelta)
+  const latitudeDelta = parseFloat(req.query.latitudeDelta)
+  console.log({ longitude, latitude, longitudeDelta, latitudeDelta })
+
+  if (longitude && latitude && latitudeDelta && longitudeDelta) {
+
+    const { widthInMeters, heightInMeters } = convertRegionToMeters(latitudeDelta, longitudeDelta, latitude) // map width & height in meters
+    const maxDistance = Math.floor((widthInMeters > heightInMeters) ? widthInMeters : heightInMeters)
+    console.log('max distance', maxDistance)
+    const location = { type: "Point", coordinates: [longitude, latitude] }
+    console.log('location', location)
     Places.find(
       {
         location: {
-          $near: {
-            $geometry: { type: "Point", coordinates: [lon, lat] },
+          $nearSphere: {
+            $geometry: location,
             $minDistance: 0,
-            $maxDistance: 10000
+            $maxDistance: maxDistance,
           }
         }
       }

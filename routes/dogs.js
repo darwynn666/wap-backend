@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
         res.json({ result: false, error: 'Missing or empty fields' });
         return;
     }
-    const newdog = new Dog({
+    const newDog = new Dog({
         name: req.body.name,
         sex: req.body.sex,
         race: req.body.race,
@@ -21,8 +21,8 @@ router.post('/', (req, res) => {
         isFake: false,
     });
 
-    newdog.save().then(() => {
-        res.json({ result: true, data: newdog })
+    newDog.save().then(() => {
+        res.json({ result: true, data: newDog })
         console.log(Dog)
     })
 
