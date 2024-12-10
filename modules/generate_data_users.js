@@ -109,7 +109,7 @@ const generateUsersData = async (nbUsers) => {
   // console.log(response);
   console.log("generate users Done");
   if (response.length > 0)
-    return ({ result: true, status: `${response.length}users created in bdd` });
+    return ({ result: true, status: `${response.length} users created in bdd` });
   else return ({ result: false, status: `error` });
 };
 
