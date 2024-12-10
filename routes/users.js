@@ -18,7 +18,6 @@ router.post('/signup', (req, res) => {
   User.findOne({ "infos.email": req.body.email }).then(data => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
-
       const newUser = new User({
         infos: {
           firstname: req.body.firstname,
@@ -75,6 +74,17 @@ router.post('/checkmail', (req, res) => {
     }
   });
 });
+
+router.get('/:token',(req, res) => {
+  User.findOne({'token':req.body.token}).then(data=>{
+    console.log(data)
+    if (data=== null) {
+      res.json({result: false,error: 'user not found'})
+    } else {
+      res.json({result: true, data})
+    }
+  })
+})
 
 
 
