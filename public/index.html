@@ -64,16 +64,16 @@
 
   <!-- places -->
 
-  <h2 class="todo">GET /places/:lon:lat</h2>
-  <h4 class="todo">params (+ :geojson)</h4>
-  <h4 class="todo">Liste des lieux</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="todo">GET /places</h2>
+  <h4 class="done">params : { name, houseNumber, street, postcode, city, longitude, latitude, description, type }</h4>
+  <h4 class="todo">Liste des lieux (filtre optionnel: ?lon=number&lat=number)</h4>
+  <h4 class="done">response : { result : boolean }</h4>
   <hr />
 
-  <h2 class="todo">POST /places</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Ajout d'un nouveau lieu</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">POST /places</h2>
+  <h4 class="done">params</h4>
+  <h4 class="done">Ajout d'un nouveau lieu</h4>
+  <h4 class="done">response : { result : boolean, data: data }</h4>
   <hr />
 
   <h2 class="todo">PUT /places</h2>

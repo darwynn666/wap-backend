@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const pointSchema = mongoose.Schema({
-     type : {
+    type: {
         type: String,
-        enum:['Point'],
+        enum: ['Point'],
         required: true
     },
     coordinates: {
-        type : [Number],
+        type: [Number],
         required: true,
     }
 });
@@ -19,10 +19,10 @@ const placesSchema = mongoose.Schema({
     street: String,
     postcode: Number,
     city: String,
-    location:{type : pointSchema, required: true},
-    description:String,
+    location: { type: pointSchema, required: true },
+    description: String,
     type: String,
-    users:[{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
     isFake: Boolean,
 });
 const Places = mongoose.model('places', placesSchema);
