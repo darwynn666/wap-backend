@@ -34,7 +34,7 @@ const usersSchema = mongoose.Schema({
     infos: usersinfosSchema,
     password: String,
     token: String,
-    Status: String,
+    status: String,
     currentLocation: {
         type: {
             type: String,
