@@ -15,7 +15,7 @@ router.post('/signup', (req, res) => {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
-  
+
   // Check if the user has not already been registered
   User.findOne({ "infos.email": req.body.email }).then(data => {
     if (data === null) {
@@ -31,14 +31,14 @@ router.post('/signup', (req, res) => {
         token: uid2(32),
         dogs: req.body.dogs,
         isFake: false,
-        
+
       });
-      
+
       newUser.save().then(newDoc => {
         res.json({ result: true, token: newDoc.token });
         console.log(newDoc)
       });
-      
+
     } else {
       // User already exists in database
       res.json({ result: false, error: 'User already exists' });
@@ -64,7 +64,7 @@ router.post('/signin', (req, res) => {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
-  
+
   User.findOne({ "infos.email": req.body.email }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token });
@@ -136,26 +136,24 @@ router.get('/:token', (req, res) => {
 })
 
 
-router.put('/updateuser/:token', (req, res) => {
-  token = req.params.token;
-  const hash = bcrypt.hashSync(req.body.password, 10);
-  User.findOne({ token }).then(data => {
-    // console.log(data)
-    data.infos.firstname = req.body.firstname;
-    data.infos.lastname = req.body.lastname;
-    data.infos.email = req.body.email;
-    data.infos.telephone = req.body.telephone;
-    data.infos.photo = req.body.photo,
-      data.infos.isDogSitter = req.body.isDogSitter;
-    data.infos.isSearchingDogSitter = req.body.isSearchingDogSitter;
-    data.password = hash;
-    data.save().then(dataupdated => {
-      res.json({ result: true, message: "modifications effectuées", data: dataupdated })
-    })
-  })
+// PUT /users/id/status : update users status
+router.put('/:id/status', (req, res) => {
+  const token = req.params.id
+  const { status } = req.body
+
+  if (!status ) {
+      res.json({ result: false, error: 'Invalid form data : missing status field' })
+      return
+  }
+  User.updateOne({ token: token }, { $set: { status } })
+      .then(data => {
+          console.log(data)
+          res.json({ result: true, data: data })
+      })
+      .catch(error => {
+          res.json({ result: false, error: error })
+      })
 })
-
-
 
 
 

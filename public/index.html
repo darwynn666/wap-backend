@@ -62,22 +62,28 @@
 
   <!-- /dogs -->
 
-  <h2 class="todo">GET /dogs</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Liste des lieux</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">GET /dogs/id</h2>
+  <h4 class="done">params id = user token</h4>
+  <h4 class="done">Liste des chiens de l'user token</h4>
+  <h4 class="done">response : { result : boolean, data: [userDogs] }</h4>
   <hr />
 
-  <h2 class="todo">POST /dogs</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Création d'un nouveau chien</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">POST /dogs</h2>
+  <h4 class="done">params</h4>
+  <h4 class="done">Création d'un nouveau chien</h4>
+  <h4 class="done">response : { result : boolean, data: newDogData }</h4>
   <hr />
 
-  <h2 class="todo">PUT /dogs/status</h2>
-  <h4 class="todo">params {status: string , isTaken:boolean}</h4>
-  <h4 class="todo">Mise a jour du status du chien</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">PUT /dogs/id</h2>
+  <h4 class="done">params id = dog_id</h4>
+  <h4 class="done">Update infos chien { name, photo, sex, race, birthday, chipid }</h4>
+  <h4 class="done">response : { result : boolean, data: data }</h4>
+  <hr />
+
+  <h2 class="done">PUT /dogs/id/status</h2>
+  <h4 class="done">params id = dog_id, { status: string , isTaken:boolean }</h4>
+  <h4 class="done">Mise a jour du status du chien</h4>
+  <h4 class="done">response : { result : boolean, data: data }</h4>
   <hr />
 
   <!-- places -->
