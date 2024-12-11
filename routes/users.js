@@ -11,33 +11,32 @@ const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 
 // sign up
 router.post('/signup', (req, res) => {
-  if (!checkBody(req.body, ['lastname', 'firstname', 'email', 'telephone', 'password'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
-    return;
+  const { firstname, lastname, email, telephone, password, dogs } = req.body
+
+  if (!firstname || !lastname || !email || !telephone || !password) {
+    res.json({ result: false, error: 'Missing or empty fields' })
+    return
   }
 
   // Check if the user has not already been registered
   User.findOne({ "infos.email": req.body.email }).then(data => {
-    if (data === null) {
+    if (!data) {
       const hash = bcrypt.hashSync(req.body.password, 10);
       const newUser = new User({
-        infos: {
-          firstname: req.body.firstname,
-          lastname: req.body.lastname,
-          telephone: req.body.telephone,
-          email: req.body.email,
-        },
+        infos: { firstname, lastname, telephone, email },
         password: hash,
         token: uid2(32),
         dogs: req.body.dogs,
         isFake: false,
-
+        status:'off',
+        currentLocation: { type: 'Point', coordinates: [0, 0] }
       });
 
       newUser.save().then(newDoc => {
         res.json({ result: true, token: newDoc.token });
         console.log(newDoc)
-      });
+      })
+        .catch(error => { res.json({ error: error }) })
 
     } else {
       // User already exists in database

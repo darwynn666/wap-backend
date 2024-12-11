@@ -24,6 +24,7 @@ router.get('/:token', (req, res) => {
 
 // POST /dogs : add a new dog, returns the new dog
 router.post('/', (req, res) => {
+    console.log('POST /dogs')
     if (!checkBody(req.body, ['name', 'sex'])) {
         res.json({ result: false, error: 'Missing or empty fields' });
         return;
