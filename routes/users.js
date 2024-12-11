@@ -28,7 +28,8 @@ router.post('/signup', (req, res) => {
         token: uid2(32),
         dogs: req.body.dogs,
         isFake: false,
-        status:'off',
+        status: 'off',
+        friends: { accepted: [], incoming: [], outcoming: [], blocked: [] },
         currentLocation: { type: 'Point', coordinates: [0, 0] }
       });
 
@@ -173,7 +174,12 @@ router.put('/:id/status', (req, res) => {
   User.updateOne({ token: token }, { $set: { status } })
     .then(data => {
       console.log(data)
-      res.json({ result: true, data: data })
+      if (matchedCount > 0) {
+        res.json({ result: true, data: data })
+      }
+      else {
+        res.json({ result: false, data: data })
+      }
     })
     .catch(error => {
       res.json({ result: false, error: error })

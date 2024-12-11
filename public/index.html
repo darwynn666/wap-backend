@@ -109,13 +109,13 @@
   <!-- friends -->
 
   <h2 class="done">GET /friends/id</h2>
-  <h4 class="todo">params id = user token</h4>
-  <h4 class="todo">Liste des amis de l'user token</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h4 class="done">params id = user token</h4>
+  <h4 class="done">Liste des amis de l'user token</h4>
+  <h4 class="done">response : { result : boolean, data: {accepted:[],incoming:[],outcoming:[],blocked:[]} }</h4>
   <hr />
   
-  <h2 class="todo">POST /friends/outcomming</h2>
-  <h4 class="todo">params</h4>
+  <h2 class="done">POST /friends/outcomming // updateOne ne fonctionne pas</h2>
+  <h4 class="todo">params id = token, req.body = {friendFrom, friendTo} (mongodb_ids)</h4>
   <h4 class="todo">Envoi d'une demande d'ami</h4>
   <h4 class="todo">response : { result : boolean, data: data }</h4>
   <hr />
