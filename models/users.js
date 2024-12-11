@@ -1,25 +1,25 @@
 const mongoose = require('mongoose');
 
 const pointSchema = mongoose.Schema({
-     type : {
+    type: {
         type: String,
-        enum:['Point'],
+        enum: ['Point'],
         required: true
     },
     coordinates: {
-        type : [Number],
+        type: [Number],
         required: true,
     }
 });
 
-const users_friendsSchema= mongoose.Schema({
-    accepted:[{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-    incoming:[{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-    outcoming:[{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-    blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+const users_friendsSchema = mongoose.Schema({
+    accepted: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    incoming: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    outcoming: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
 });
 
-const usersinfosSchema= mongoose.Schema({
+const usersinfosSchema = mongoose.Schema({
     firstname: String,
     lastname: String,
     telephone: String,
@@ -35,12 +35,26 @@ const usersSchema = mongoose.Schema({
     password: String,
     token: String,
     Status: String,
-    currentLocation:{type : pointSchema, required: false},
-    homeLocation:{type : pointSchema, required: false},
-    dogs:[{type: mongoose.Schema.Types.ObjectId, ref: 'dogs' }],
+    currentLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: true
+        },
+        coordinates: {
+            type: [Number],
+            required: true,
+        }
+    },
+    homeLocation: { type: pointSchema, required: false },
+    dogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'dogs' }],
     friends: [users_friendsSchema],
-    isFake:Boolean,
+    isFake: Boolean,
 });
+
+// usersSchema.index({ currentLocation: '2dsphere' });
+
+
 const User = mongoose.model('users', usersSchema);
 
 module.exports = User;

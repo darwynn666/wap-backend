@@ -36,7 +36,7 @@ const placesSchema = mongoose.Schema({
     isFake: Boolean,
 });
 
-placesSchema.index({ location: '2dsphere' });
+// placesSchema.index({ location: '2dsphere' });
 
 const Places = mongoose.model('places', placesSchema);
 

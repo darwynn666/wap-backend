@@ -43,46 +43,38 @@ router.get('/', (req, res) => {
   const latitude = parseFloat(req.query.latitude)
   const longitudeDelta = parseFloat(req.query.longitudeDelta)
   const latitudeDelta = parseFloat(req.query.latitudeDelta)
-  console.log({ longitude, latitude, longitudeDelta, latitudeDelta })
+  // console.log({ longitude, latitude, longitudeDelta, latitudeDelta })
+
+  let placesQuery = null
 
   if (longitude && latitude && latitudeDelta && longitudeDelta) {
 
     const { widthInMeters, heightInMeters } = convertRegionToMeters(latitudeDelta, longitudeDelta, latitude) // map width & height in meters
     const maxDistance = Math.floor((widthInMeters > heightInMeters) ? widthInMeters : heightInMeters)
-    console.log('max distance', maxDistance)
+    // console.log('max distance', maxDistance)
     const location = { type: "Point", coordinates: [longitude, latitude] }
-    console.log('location', location)
-    Places.find(
-      {
-        location: {
-          $nearSphere: {
-            $geometry: location,
-            $minDistance: 0,
-            $maxDistance: maxDistance,
-          }
-        }
-      }
-    )
+    // console.log('location', location)
 
-      .then(data => {
-        if (data) {
-          console.log('places: ', data.length)
-          res.json({ result: true, data: data })
-        } else {
-          res.json({ result: false })
+    placesQuery = {
+      location: {
+        $near: {
+          $geometry: location,
+          $minDistance: 0,
+          $maxDistance: maxDistance,
         }
-      })
-  }
-  else {
-    Places.find().then(data => {
-      if (data) {
-        console.log('places: ', data.length)
-        res.json({ result: true, data: data })
-      } else {
-        res.json({ result: false })
       }
-    })
+    }
   }
+
+
+  Places.find(placesQuery).then(data => {
+    if (data) {
+      console.log('places: ', data.length)
+      res.json({ result: true, data: data })
+    } else {
+      res.json({ result: false })
+    }
+  })
 })
 
 

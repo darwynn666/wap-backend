@@ -12,32 +12,50 @@
 
   <!-- /users -->
 
-  <h2 class="todo">GET /users/:lon:lat</h2>
-  <h4 class="todo">lon, lat : coordonées de départ pour recherche geojson</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
-  <h4 class="todo">...</h4>
+  <h2 class="done">GET /users</h2>
+  <h4 class="done">no params</h4>
+  <h4 class="done">Tous les users, (optional query:longitude, latitude, longitudeDelta, latitudeDelta)</h4>
+  <h4 class="done">response : { result : true, data: [usersData] }, retourne toujours true, avec data:[]</h4>
   <hr />
 
-  <h2 class="todo">POST /users</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Création d'un nouvel utilisateur</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">GET /users/id</h2>
+  <h4 class="done">id = token</h4>
+  <h4 class="done">Get un seul utilisateur</h4>
+  <h4 class="done">response : { result : boolean, data: userDatas }</h4>
   <hr />
 
-  <h2 class="todo">PUT /users</h2>
-  <h4 class="todo">params</h4>
+  <h2 class="done">POST /users/signup</h2>
+  <h4 class="done">params dans le req.body</h4>
+  <h4 class="done">Création d'un nouvel utilisateur</h4>
+  <h4 class="done">response : { result : boolean, token: token }</h4>
+  <hr />
+
+  <h2 class="done">POST /users/signin</h2>
+  <h4 class="done">params email et password</h4>
+  <h4 class="done">Login utilisateur existant</h4>
+  <h4 class="done">response : { result : boolean, token: token }</h4>
+  <hr />
+
+  <h2 class="done">POST /users/checkmail</h2>
+  <h4 class="done">param email</h4>
+  <h4 class="done">Vérifie l'existence d'un mail avant le sign up</h4>
+  <h4 class="done">response : { result : boolean }</h4>
+  <hr />
+
+  <h2 class="todo">PUT /users/id</h2>
+  <h4 class="todo">id = token + params req.body</h4>
   <h4 class="todo">Modification d'un utilisateur</h4>
   <h4 class="todo">response : { result : boolean, data: data }</h4>
   <hr />
 
-  <h2 class="todo">DELETE /users</h2>
-  <h4 class="todo">params</h4>
+  <h2 class="todo">DELETE /users/id</h2>
+  <h4 class="todo">id = token</h4>
   <h4 class="todo">Delete d'un utilisateur</h4>
   <h4 class="todo">response : { result : boolean, data: data }</h4>
   <hr />
 
-  <h2 class="todo">PUT /users/status</h2>
-  <h4 class="todo">params</h4>
+  <h2 class="todo">PUT /users/id/status</h2>
+  <h4 class="todo">id = token</h4>
   <h4 class="todo">Met a jours le status utilisateur (home, walk, pause)</h4>
   <h4 class="todo">response : { result : boolean, data: data }</h4>
   <hr />
@@ -66,7 +84,7 @@
 
   <h2 class="done">GET /places</h2>
   <h4 class="done">params : { name, houseNumber, street, postcode, city, longitude, latitude, description, type }</h4>
-  <h4 class="done">Liste des lieux (filtre optionnel: ?lon=number&lat=number)</h4>
+  <h4 class="done">Liste des lieux (optional query:longitude, latitude, longitudeDelta, latitudeDelta)</h4>
   <h4 class="done">response : { result : boolean }</h4>
   <hr />
 
