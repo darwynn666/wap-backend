@@ -7,13 +7,15 @@ const Dog = require('../models/dogs');
 const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
+const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 
+// sign up
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['lastname', 'firstname', 'email', 'telephone', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
-
+  
   // Check if the user has not already been registered
   User.findOne({ "infos.email": req.body.email }).then(data => {
     if (data === null) {
@@ -29,14 +31,14 @@ router.post('/signup', (req, res) => {
         token: uid2(32),
         dogs: req.body.dogs,
         isFake: false,
-
+        
       });
-
+      
       newUser.save().then(newDoc => {
         res.json({ result: true, token: newDoc.token });
         console.log(newDoc)
       });
-
+      
     } else {
       // User already exists in database
       res.json({ result: false, error: 'User already exists' });
@@ -44,21 +46,7 @@ router.post('/signup', (req, res) => {
   });
 });
 
-router.post('/signin', (req, res) => {
-  if (!checkBody(req.body, ['email', 'password'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
-    return;
-  }
-
-  User.findOne({ "infos.email": req.body.email }).then(data => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, token: data.token });
-    } else {
-      res.json({ result: false, error: 'User not found or wrong password' });
-    }
-  });
-});
-
+// check if email exists before sign up
 router.post('/checkmail', (req, res) => {
   User.findOne({ 'infos.email': req.body.email }).then(data => {
     if (data === null) {
@@ -70,22 +58,89 @@ router.post('/checkmail', (req, res) => {
   });
 });
 
-router.get('/:token', (req, res) => {
-  User.findOne({ 'token': req.body.token }).then(data => {
-    console.log(data)
-    if (data === null) {
-      res.json({ result: false, error: 'user not found' })
+// sign in
+router.post('/signin', (req, res) => {
+  if (!checkBody(req.body, ['email', 'password'])) {
+    res.json({ result: false, error: 'Missing or empty fields' });
+    return;
+  }
+  
+  User.findOne({ "infos.email": req.body.email }).then(data => {
+    if (data && bcrypt.compareSync(req.body.password, data.password)) {
+      res.json({ result: true, token: data.token });
     } else {
-      res.json({ result: true, data })
+      res.json({ result: false, error: 'User not found or wrong password' });
     }
   });
 });
+
+
+
+
+// GET /users
+router.get('/', (req, res) => {
+
+  const longitude = parseFloat(req.query.longitude)
+  const latitude = parseFloat(req.query.latitude)
+  const longitudeDelta = parseFloat(req.query.longitudeDelta)
+  const latitudeDelta = parseFloat(req.query.latitudeDelta)
+  // console.log({ longitude, latitude, longitudeDelta, latitudeDelta })
+
+  let usersQuery = null
+
+  if (longitude && latitude && latitudeDelta && longitudeDelta) {
+
+    const { widthInMeters, heightInMeters } = convertRegionToMeters(latitudeDelta, longitudeDelta, latitude) // map width & height in meters
+    const maxDistance = Math.floor((widthInMeters > heightInMeters) ? widthInMeters : heightInMeters)
+    // console.log('max distance', maxDistance)
+    const location = { type: "Point", coordinates: [longitude, latitude] }
+    // console.log('location', location)
+
+    usersQuery = {
+      currentLocation: {
+        $near: {
+          $geometry: location,
+          $minDistance: 0,
+          $maxDistance: maxDistance,
+        }
+      }
+    }
+  }
+
+  User.find(usersQuery).then(data => {
+    if (data) {
+      console.log('users', data.length)
+      res.json({ result: true, data: data })
+    }
+    else {
+      res.json({ result: true, data: [] }) // returns an empty array if no results
+    }
+  })
+
+})
+
+
+// GET unique user
+router.get('/:token', (req, res) => {
+  const token = req.params.token
+
+  User.findOne({ token: token }).then(data => {
+    if (data) {
+      res.json({ result: true, data: data })
+    }
+    else {
+      res.json({ result: false, error: `Token not found : ${token}` })
+    }
+  })
+
+})
+
 
 router.put('/updateuser/:token', (req, res) => {
   token = req.params.token;
   const hash = bcrypt.hashSync(req.body.password, 10);
   User.findOne({ token }).then(data => {
-   // console.log(data)
+    // console.log(data)
     data.infos.firstname = req.body.firstname;
     data.infos.lastname = req.body.lastname;
     data.infos.email = req.body.email;
