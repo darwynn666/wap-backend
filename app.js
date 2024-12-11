@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dogsRouter = require('./routes/dogs');
 var placesRouter = require('./routes/places')
+var friendsRouter = require('./routes/friends')
 var generateDataRouter = require('./routes/generateData');
 
 var app = express();
@@ -26,6 +27,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/dogs', dogsRouter);
 app.use('/places', placesRouter);
+app.use('/friends', friendsRouter);
 app.use('/generatedata', generateDataRouter);
 
 module.exports = app;

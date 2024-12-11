@@ -48,7 +48,7 @@ const usersSchema = mongoose.Schema({
     },
     homeLocation: { type: pointSchema, required: false },
     dogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'dogs' }],
-    friends: [users_friendsSchema],
+    friends: users_friendsSchema,
     isFake: Boolean,
 });
 
