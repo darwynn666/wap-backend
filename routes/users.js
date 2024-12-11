@@ -136,25 +136,50 @@ router.get('/:token', (req, res) => {
 })
 
 
+// PUT /users/id      update user
+router.put('/:id', (req, res) => {
+  const token = req.params.id
+  const { firstname, lastname, telephone, email, photo, isDogSitter, isSearchingDogSitter } = req.body
+  console.log(req.body)
+
+  if (!firstname || !lastname || !telephone || !email || !photo || !isDogSitter || !isSearchingDogSitter) {
+    res.json({ result: false, error: 'Invalid form data' })
+    return
+  }
+
+  User.updateOne({ token: token }, { $set: { infos: { firstname, lastname, telephone, email, photo, isDogSitter, isSearchingDogSitter } } })
+    .then(data => {
+      console.log(data)
+      if (data.matchedCount > 0) {
+        res.json({ result: true, data: data })
+      }
+      else {
+        res.json({ result: false, data: data })
+      }
+    })
+    .catch(error => {
+      res.json({ result: false, error: error })
+    })
+})
+
 // PUT /users/id/status : update users status
 router.put('/:id/status', (req, res) => {
   const token = req.params.id
   const { status } = req.body
 
-  if (!status ) {
-      res.json({ result: false, error: 'Invalid form data : missing status field' })
-      return
+  if (!status) {
+    res.json({ result: false, error: 'Invalid form data : missing status field' })
+    return
   }
   User.updateOne({ token: token }, { $set: { status } })
-      .then(data => {
-          console.log(data)
-          res.json({ result: true, data: data })
-      })
-      .catch(error => {
-          res.json({ result: false, error: error })
-      })
+    .then(data => {
+      console.log(data)
+      res.json({ result: true, data: data })
+    })
+    .catch(error => {
+      res.json({ result: false, error: error })
+    })
 })
-
 
 
 
