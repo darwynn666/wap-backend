@@ -51,26 +51,34 @@ router.post('/:token/outcoming', async (req, res) => {
     if (!friendFrom || !friendTo) { res.json({ result: false, error: 'missing form fields' }); return }
 
     // get friends from both users (FROM and TO)
-    const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) })
-    const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) })
+    const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
+    const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
     if (!userFrom || !userTo) { res.json({ result: false, error: 'unknown user' }); return }
+
+    const myId = userFrom._id
+    const hisId = userTo._id
+    const myFriends = userFrom.friends
+    const hisFriends = userTo.friends
+
+    if (myFriends.accepted.includes(hisId) || hisFriends.accepted.includes(myId)) { // check if relation already exists
+        res.json({ result: false, error: 'this relation already exists', myFriends, hisFriends })
+        return
+    }
+
+    if (myFriends.outcoming.includes(hisId) && hisFriends.incoming.includes(myId)) { // check if this demand exists
+        res.json({ result: false, error: 'this demand already exists' })
+        return
+    }
+
+    myFriends.outcoming.push(hisId)
+    hisFriends.incoming.push(myId)
 
     const promises = []
 
-    if (!userFrom.friends.outcoming.includes(friendTo)) { // update friends on user friendFROM
-        userFrom.friends.outcoming.push(friendTo)
-        promises.push(
-            User.updateOne({ token: token }, { $set: { 'friends.outcoming': userFrom.friends.outcoming } })
-                .catch(error => { res.json({ result: false, error }); return })
-        )
-    }
-    if (!userTo.friends.incoming.includes(friendFrom)) { // update friends on user friendTO
-        userTo.friends.incoming.push(friendFrom)
-        promises.push(
-            User.updateOne({ _id: friendTo }, { $set: { 'friends.incoming': userTo.friends.incoming } })
-                .catch(error => { res.json({ result: false, error }); return })
-        )
-    }
+    promises.push(
+        User.updateOne({ token: token }, { $set: { friends: myFriends } }).catch(error => { res.json({ result: false, error }); return }),
+        User.updateOne({ _id: hisId }, { $set: { friends: hisFriends } }).catch(error => { res.json({ result: false, error }); return })
+    )
 
     Promise.all(promises).then(() => { // execute two queries
         res.json({ result: true, userFromFriends: userFrom.friends, userToFriends: userTo.friends })
