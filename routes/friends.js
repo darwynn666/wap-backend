@@ -50,7 +50,6 @@ router.post('/:token/outcoming', async (req, res) => {
     const { friendFrom, friendTo } = req.body
     if (!friendFrom || !friendTo) { res.json({ result: false, error: 'missing form fields' }); return }
 
-    // get friends from both users (FROM and TO)
     const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
     if (!userFrom || !userTo) { res.json({ result: false, error: 'unknown user' }); return }
@@ -93,7 +92,7 @@ router.put('/:token/incoming', async (req, res) => {
     const token = req.params.token
     const { friendFrom, accept } = req.body
     if (!friendFrom || !accept) { res.json({ result: false, error: 'missing fields' }) }
-    // import users friends
+
     const userTo = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // it's me
     const userFrom = await User.findById(friendFrom).catch(error => { res.json({ result: false, error }) }) // the other one
 
@@ -138,7 +137,7 @@ router.put('/:token/outcoming', async (req, res) => {
     const token = req.params.token
     const { friendTo } = req.body
     if (!friendTo) { res.json({ result: false, error: 'missing field friendTo' }) }
-    // import users friends
+
     const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
 
@@ -178,7 +177,7 @@ router.delete('/:token', async (req, res) => {
     const token = req.params.token
     const { friendToDelete } = req.body
     if (!friendToDelete) { res.json({ result: false, error: 'missing field friendToDelete' }) }
-    // import users friends
+
     const user = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userToDelete = await User.findById(friendToDelete).catch(error => { res.json({ result: false, error }) }) // the friend
 

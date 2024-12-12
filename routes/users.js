@@ -9,56 +9,48 @@ const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 
-// sign up
+// POST /users/signup : sign up
 router.post('/signup', (req, res) => {
   const { firstname, lastname, email, telephone, password, dogs } = req.body
 
-  if (!firstname || !lastname || !email || !telephone || !password) {
+  if (!firstname || !lastname || !email || !telephone || !password) { // check body
     res.json({ result: false, error: 'Missing or empty fields' })
     return
   }
 
-  // Check if the user has not already been registered
-  User.findOne({ "infos.email": req.body.email }).then(data => {
-    if (!data) {
-      const hash = bcrypt.hashSync(req.body.password, 10);
-      const newUser = new User({
-        infos: { firstname, lastname, telephone, email },
-        password: hash,
-        token: uid2(32),
-        dogs: req.body.dogs,
-        isFake: false,
-        status: 'off',
-        friends: { accepted: [], incoming: [], outcoming: [], blocked: [] },
-        currentLocation: { type: 'Point', coordinates: [0, 0] }
-      });
+  User.findOne({ "infos.email": req.body.email }).then(data => { // Check if the user has not already been registered
+    if (data) { res.json({ result: false, error: 'User already exists' }) }
+    return
+  })
 
-      newUser.save().then(newDoc => {
-        res.json({ result: true, token: newDoc.token });
-        console.log(newDoc)
-      })
-        .catch(error => { res.json({ error: error }) })
+  const hash = bcrypt.hashSync(req.body.password, 10)
+  const newUser = new User({
+    infos: { firstname, lastname, telephone, email },
+    password: hash,
+    token: uid2(32),
+    dogs: req.body.dogs,
+    isFake: false,
+    status: 'off',
+    friends: { accepted: [], incoming: [], outcoming: [], blocked: [] },
+    currentLocation: { type: 'Point', coordinates: [0, 0] }
+  })
 
-    } else {
-      // User already exists in database
-      res.json({ result: false, error: 'User already exists' });
-    }
-  });
-});
+  newUser.save().then(newDoc => {
+    res.json({ result: true, token: newDoc.token });
+    console.log(newDoc)
+  })
+    .catch(error => { res.json({ result: false, error: error }) })
+})
 
-// check if email exists before sign up
+// POST /users/checkmail : check if email exists before sign up
 router.post('/checkmail', (req, res) => {
   User.findOne({ 'infos.email': req.body.email }).then(data => {
-    if (data === null) {
-      res.json({ result: false });
-    } else {
-      res.json({ result: true });
-      console.log(data)
-    }
+    if (!data) { res.json({ result: false }) }
+    else { res.json({ result: true }) }
   });
 });
 
-// sign in
+// POST /users/signin : sign in
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['email', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -136,30 +128,30 @@ router.get('/:token', (req, res) => {
 })
 
 
-// PUT /users/id      update user
+// PUT /users/id      update user infos (password optional)
 router.put('/:id', (req, res) => {
   const token = req.params.id
-  const { firstname, lastname, telephone, email, photo, isDogSitter, isSearchingDogSitter } = req.body
-  console.log(req.body)
+  const { firstname, lastname, telephone, email, isDogSitter, isSearchingDogSitter, password } = req.body
 
-  if (!firstname || !lastname || !telephone || !email || !photo || !isDogSitter || !isSearchingDogSitter) {
+  if ((!firstname || !lastname || !telephone || !email) || (typeof isDogSitter !== 'boolean' || typeof isSearchingDogSitter !== 'boolean')) { // check body
     res.json({ result: false, error: 'Invalid form data' })
     return
   }
 
-  User.updateOne({ token: token }, { $set: { infos: { firstname, lastname, telephone, email, photo, isDogSitter, isSearchingDogSitter } } })
+  if (password !== '') { // update password if not empty
+    const hash = bcrypt.hashSync(password, 10);
+    console.log('update password', hash)
+    User.updateOne({ token: token }, { $set: { password: hash } }).catch(error => res.json({ return: false, error }))
+  }
+
+
+  User.updateOne({ token: token }, { $set: { infos: { firstname, lastname, telephone, email, isDogSitter, isSearchingDogSitter } } })
     .then(data => {
       console.log(data)
-      if (data.matchedCount > 0) {
-        res.json({ result: true, data: data })
-      }
-      else {
-        res.json({ result: false, data: data })
-      }
+      if (data.matchedCount > 0) { res.json({ result: true, data: data }) }
+      else { res.json({ result: false, data: data }) }
     })
-    .catch(error => {
-      res.json({ result: false, error: error })
-    })
+    .catch(error => res.json({ result: false, error: error }))
 })
 
 // PUT /users/id/status : update users status
@@ -171,6 +163,7 @@ router.put('/:id/status', (req, res) => {
     res.json({ result: false, error: 'Invalid form data : missing status field' })
     return
   }
+
   User.updateOne({ token: token }, { $set: { status } })
     .then(data => {
       console.log(data)
