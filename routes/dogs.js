@@ -8,7 +8,7 @@ const User = require('../models/users')
 
 // default
 router.get('/', (req, res) => {
-    res.json({ result: false, error: 'Missing token, try /dogs/token' })
+    res.json({ message: 'test route' })
 })
 
 // GET /dogs/id : get user's dogs array
@@ -24,8 +24,8 @@ router.get('/:token', (req, res) => {
 
 // POST /dogs : add a new dog, returns the new dog
 router.post('/', (req, res) => {
-    console.log('POST /dogs')
-    if (!checkBody(req.body, ['name', 'sex'])) {
+    const { name, sex } = req.body
+    if (!name || !sex) {
         res.json({ result: false, error: 'Missing or empty fields' });
         return;
     }
@@ -42,42 +42,79 @@ router.post('/', (req, res) => {
 })
 
 // PUT /dogs/id : update a dog (infos), returns boolean
-router.put('/:id', (req, res) => {
+router.put('/:token', (req, res) => {
+    const token = req.params.token
+    const { _id, name, sex, race, birthday, chipid } = req.body
 
-    const id = req.params.id
-    const { name, photo, sex, race, birthday, chipid } = req.body
-
-    if (!name || !photo || !sex || !race || !birthday || !chipid) {
+    if (!_id || !name || !sex) { // required
         res.json({ result: false, error: 'Invalid form data' })
         return
     }
-    Dog.updateOne({ _id: id }, { $set: { name, photo, sex, race, birthday, chipid } })
-        .then(data => {
-            // console.log(data)
-            res.json({ result: true, data: data })
+
+    const dogId = _id
+    User.findOne({ token: token })
+        .then(user => {
+            if (user && user?.dogs.includes(dogId)) { // check if user owns this dog
+                Dog.updateOne({ _id: dogId }, { $set: { name, sex, race, birthday, chipid } })
+                    .then(() => { Dog.findOne({ _id: dogId }).then(dog => { res.json({ result: true, dog }) }) })
+                    .catch(error => { res.json({ result: false, error }); return })
+            }
+            else { res.json({ result: false, error: 'not your dog' }) }
         })
-        .catch(error => {
-            res.json({ result: false, error: error })
-        })
+        .catch(error => { res.json({ result: false, error }); return })
 })
 
-// PUT /dogs/id/status : update dog's status and isTaken
-router.put('/:id/status', (req, res) => {
-    const id = req.params.id
-    const { status, isTaken } = req.body
+// PUT /dogs/id/status : update dog's status and isTaken    //    VERIF TOKEN CHECK IF IS MY DOG
+router.put('/:token/status', (req, res) => {
+    const token = req.params.token
+    const { _id, status, isTaken } = req.body
 
-    if (!status || !isTaken) {
+    if (!_id || !status || typeof isTaken !== 'boolean') { // required
         res.json({ result: false, error: 'Invalid form data' })
         return
     }
-    Dog.updateOne({ _id: id }, { $set: { status, isTaken } })
-        .then(data => {
-            console.log(data)
-            res.json({ result: true, data: data })
-        })
-        .catch(error => {
-            res.json({ result: false, error: error })
-        })
+
+    const dogId = _id
+    User.findOne({ token: token }).then(user => {
+        if (user && user?.dogs.includes(dogId)) { // check if user owns this dog
+            Dog.updateOne({ _id: dogId }, { $set: { status, isTaken } })
+                .then(() => { Dog.findOne({ _id: dogId }).then(dog => { res.json({ result: true, dog }) }) })
+                .catch(error => { res.json({ result: false, error }); return })
+        }
+        else { res.json({ result: false, error: 'not your dog' }) }
+    })
+        .catch(error => { res.json({ result: false, error }); return })
+
+})
+
+// DELETE /dogs/id : delete a dog
+router.delete('/:token', (req, res) => {
+    const token = req.params.token
+    const { _id } = req.body
+
+    if (!_id) { // required
+        res.json({ result: false, error: 'Invalid form data' })
+        return
+    }
+
+    const dogId = _id
+    User.findOne({ token: token }).then(user => {
+        if (user && user?.dogs.includes(dogId)) { // check if user owns this dog
+            user.dogs = user.dogs.filter(id => !id.equals(dogId))
+            const promises = []
+            promises.push(
+                User.updateOne({ token }, { $set: { dogs: user.dogs } }).catch(error => { res.json({ result: false, error }); return }),
+                Dog.deleteOne({ _id: dogId }).catch(error => { res.json({ result: false, error }); return })
+            )
+            Promise.all(promises).then(() => {
+                res.json({ result: true, userDogs: user.dogs })
+            })
+                .catch(error => { res.json({ result: false, error }); return })
+        }
+        else { res.json({ result: false, error: 'not your dog' }) }
+    })
+        .catch(error => { res.json({ result: false, error }); return })
+
 })
 
 

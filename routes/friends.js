@@ -52,7 +52,7 @@ router.post('/:token/outcoming', async (req, res) => {
 
     const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
-    if (!userFrom || !userTo) { res.json({ result: false, error: 'unknown user' }); return }
+    if (!userFrom || !userTo) return
 
     const myId = userFrom._id
     const hisId = userTo._id
@@ -91,10 +91,11 @@ router.post('/:token/outcoming', async (req, res) => {
 router.put('/:token/incoming', async (req, res) => {
     const token = req.params.token
     const { friendFrom, accept } = req.body
-    if (!friendFrom || !accept) { res.json({ result: false, error: 'missing fields' }) }
+    if (!friendFrom || typeof accept !== 'boolean') { res.json({ result: false, error: 'missing fields' }) }
 
     const userTo = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // it's me
     const userFrom = await User.findById(friendFrom).catch(error => { res.json({ result: false, error }) }) // the other one
+    if (!userTo || !userFrom) return
 
     const myId = userTo._id
     const hisId = userFrom._id
@@ -110,10 +111,11 @@ router.put('/:token/incoming', async (req, res) => {
 
     const promises = []
 
-    if (accept === 'yes') {
+    if (accept) {
         myFriends.accepted.push(hisId) // add his id to my friends
         hisFriends.accepted.push(myId) // add my id to his friends
     }
+
     myFriends.incoming = myFriends.incoming.filter(id => !id.equals(hisId)) // remove his id from my incoming
     hisFriends.outcoming = hisFriends.outcoming.filter(id => !id.equals(myId)) // remove my id from his outcoming
 
@@ -140,6 +142,7 @@ router.put('/:token/outcoming', async (req, res) => {
 
     const userFrom = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
+    if (!userFrom || !userTo) return
 
     console.log(userTo)
 
@@ -180,6 +183,7 @@ router.delete('/:token', async (req, res) => {
 
     const user = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
     const userToDelete = await User.findById(friendToDelete).catch(error => { res.json({ result: false, error }) }) // the friend
+    if (!user || !userToDelete) return
 
     const myId = user._id
     const hisId = userToDelete._id
@@ -209,5 +213,68 @@ router.delete('/:token', async (req, res) => {
         .catch(error => { res.json({ result: false, error }) })
 })
 
+
+// POST /friends/id/block : block a person
+router.post('/:token/block', async (req, res) => {
+    const token = req.params.token
+    const { friendToBlock } = req.body
+    if (!friendToBlock) { res.json({ result: false, error: 'missing field friendToBlock' }) }
+
+    const user = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
+    const userToBlock = await User.findById(friendToBlock).catch(error => { res.json({ result: false, error }) }) // the friend
+    if (!user || !userToBlock) return
+
+    const myId = user._id
+    const hisId = userToBlock._id
+    const myFriends = user.friends
+    const hisFriends = userToBlock.friends
+
+    if (myFriends.blocked.includes(hisId)) { // check if relation really exists
+        res.json({ result: false, error: 'this friend has already been blocked', myFriends, hisFriends })
+        return
+    }
+
+    myFriends.blocked.push(hisId) // add him to my block list
+    myFriends.accepted = myFriends.accepted.filter(id => !id.equals(hisId)) // remove his id from my friends
+    hisFriends.accepted = hisFriends.accepted.filter(id => !id.equals(myId)) // remove my id from his friends
+
+    const promises = []
+
+    promises.push(
+        User.updateOne({ token: token }, { $set: { friends: myFriends } }).catch(error => { res.json({ result: false, error }) }), // update my friends
+        User.updateOne({ _id: hisId }, { $set: { friends: hisFriends } }).catch(error => { res.json({ result: false, error }) }) // update his friendss
+    )
+
+    Promise.all(promises).then(() => {
+        res.json({ result: true, userFriends: myFriends, userToBlockFriends: hisFriends })
+    })
+        .catch(error => { res.json({ result: false, error }) })
+
+})
+
+// DELETE /friends/id/block : unblock a person
+router.delete('/:token/block', async (req, res) => {
+    const token = req.params.token
+    const { friendToUnBlock } = req.body
+    if (!friendToUnBlock) { res.json({ result: false, error: 'missing field friendToBlock' }) }
+
+    const user = await User.findOne({ token: token }).catch(error => { res.json({ result: false, error }) }) // me
+    const userToUnBlock = await User.findById(friendToUnBlock).catch(error => { res.json({ result: false, error }) }) // the friend
+    if (!user || !userToUnBlock) return
+
+    const myId = user._id
+    const hisId = userToUnBlock._id
+    const myFriends = user.friends
+    const hisFriends = userToUnBlock.friends
+
+    myFriends.blocked = myFriends.blocked.filter(id => !id.equals(hisId)) // remove him from my block list
+
+    User.updateOne({ token: token }, { $set: { friends: myFriends } }).catch(error => { res.json({ result: false, error }) }) // update my friends
+        .then(() => {
+            res.json({ result: true, userFriends: myFriends, userToUnBlockFriends: hisFriends })
+        })
+        .catch(error => { res.json({ result: false, error }) })
+
+})
 
 module.exports = router;

@@ -13,8 +13,8 @@
   <!-- /users -->
 
   <h2 class="done">GET /users</h2>
-  <h4 class="done">no params</h4>
-  <h4 class="done">Tous les users, (optional query:longitude, latitude, longitudeDelta, latitudeDelta)</h4>
+  <h4 class="done">optional : req.query : { longitude, latitude, longitudeDelta, latitudeDelta } </h4>
+  <h4 class="done">Tous les users</h4>
   <h4 class="done">response : { result : true, data: [usersData] }, retourne toujours true, avec data:[]</h4>
   <hr />
 
@@ -27,13 +27,13 @@
   <h2 class="done">POST /users/signup</h2>
   <h4 class="done">params dans le req.body</h4>
   <h4 class="done">Création d'un nouvel utilisateur</h4>
-  <h4 class="done">response : { result : boolean, token: token }</h4>
+  <h4 class="done">response : { result : boolean, data : userDatas }</h4>
   <hr />
 
   <h2 class="done">POST /users/signin</h2>
   <h4 class="done">params email et password</h4>
   <h4 class="done">Login utilisateur existant</h4>
-  <h4 class="done">response : { result : boolean, token: token }</h4>
+  <h4 class="done">response : { result : boolean, data : userDatas }</h4>
   <hr />
 
   <h2 class="done">POST /users/checkmail</h2>
@@ -71,19 +71,25 @@
   <h2 class="done">POST /dogs</h2>
   <h4 class="done">params</h4>
   <h4 class="done">Création d'un nouveau chien</h4>
-  <h4 class="done">response : { result : boolean, data: newDogData }</h4>
+  <h4 class="done">response : { result : boolean, data: newDog }</h4>
   <hr />
 
   <h2 class="done">PUT /dogs/id</h2>
-  <h4 class="done">params id = dog_id</h4>
-  <h4 class="done">Update infos chien { name, photo, sex, race, birthday, chipid }</h4>
-  <h4 class="done">response : { result : boolean, data: data }</h4>
+  <h4 class="done">params id = user_token, req.body : { _id: dog_id , ...dogInfos}</h4>
+  <h4 class="done">Update les infos d'un chien { name, photo, sex, race, birthday, chipid }</h4>
+  <h4 class="done">response : { result : boolean, dog }</h4>
   <hr />
 
   <h2 class="done">PUT /dogs/id/status</h2>
-  <h4 class="done">params id = dog_id, { status: string , isTaken:boolean }</h4>
+  <h4 class="done">params id = user_token , req.body { _id: dog_id, status: string , isTaken:boolean }</h4>
   <h4 class="done">Mise a jour du status du chien</h4>
-  <h4 class="done">response : { result : boolean, data: data }</h4>
+  <h4 class="done">response : { result : boolean, dog }</h4>
+  <hr />
+
+  <h2 class="done">DELETE /dogs/id</h2>
+  <h4 class="done">params id = user_token, req.body: { _id: dog_id }</h4>
+  <h4 class="done">Supprimer un chien</h4>
+  <h4 class="done">response : { result : boolean, userDogs }</h4>
   <hr />
 
   <!-- places -->
@@ -139,7 +145,7 @@
   <hr />
 
   <h2 class="done">PUT /friends/id/incomming</h2>
-  <h4 class="done">params id = token, req.body : { friendFrom:_id, accept:yes|no }</h4>
+  <h4 class="done">params id = token, req.body : { friendFrom:_id, accept:true|false }</h4>
   <h4 class="done">Accepter ou refuser une demande</h4>
   <h4 class="done">response : { result : boolean, userFromFriends, userToFriends }</h4>
   <hr />
@@ -150,16 +156,16 @@
   <h4 class="done">response : { result : boolean, userFriends, userToDeleteFriends }</h4>
   <hr />
 
-  <h2 class="todo">POST /friends/block</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Ajouter un ami dans liste de blocage</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">POST /friends/id/block</h2>
+  <h4 class="done">params id = token, req.body : { friendToBlock:_id }</h4>
+  <h4 class="done">Bloquer une personne (ami ou non)</h4>
+  <h4 class="done">response : { result : boolean, userFriends, userToBlockFriends }</h4>
   <hr />
 
-  <h2 class="todo">DELETE /friends/block</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Retirer un ami de la liste de blocage</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">DELETE /friends/id/block</h2>
+  <h4 class="done">params id = token, req.body : { friendToUnBlock:_id }</h4>
+  <h4 class="done">Retirer une personne de la liste de blocage</h4>
+  <h4 class="done">response : { result : boolean, userFriends, userToUnBlockFriends }</h4>
   <hr />
 
   <h2 class="done">GET /generatedata/dogs/:nbDogs</h2>
