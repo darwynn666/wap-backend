@@ -89,7 +89,7 @@ const generateDogsData = async (nbDogs) => {
     //chipId
     dog.chipId = uid2(6);
     //isTaken with his owner
-    dog.isTaken = false;
+    dog.isTaken = true;
     //isFalse
     dog.isFake = true;
     dogs.push(dog);

@@ -8,7 +8,7 @@ const User = require('../models/users')
 
 // default
 router.get('/', (req, res) => {
-    res.json({ result: false, error: 'missing token, try /friends/token' })
+    res.json({ message: 'test route' })
 })
 
 // GET /friends/id returns user's friends
@@ -35,40 +35,30 @@ router.post('/:token/outcoming', async (req, res) => {
     const userTo = await User.findById(friendTo).catch(error => { res.json({ error: error }) })
     if (!userFrom || !userTo) { res.json({ result: false, error: 'unknown user' }); return }
 
-    let success = 0
+    let modifCount = 0
     if (!userFrom.friends.outcoming.includes(friendTo)) {
         userFrom.friends.outcoming.push(friendTo)
-        User.updateOne({ token: token }, { $set: { 'friends-outcoming': userFrom.friends.outcoming } })
-            .then(success++)
+        console.log('update', token, userFrom.friends.outcoming, friendTo)
+        User.updateOne({ token: token }, { $set: { 'friends.outcoming': userFrom.friends.outcoming } })
+            .then((data) => { modifCount++ })
             .catch(error => { res.json({ error: error }) })
     }
     if (!userTo.friends.incoming.includes(friendFrom)) {
         userTo.friends.incoming.push(friendFrom)
-        User.updateOne({ _id: friendTo }, { $set: { 'friends-incoming': userTo.friends.incoming } })
-            .then(success++)
+        User.updateOne({ _id: friendTo }, { $set: { 'friends.incoming': userTo.friends.incoming } })
+            .then((data) => {modifCount++})
             .catch(error => { res.json({ error: error }) })
     }
 
 
-    if(success===2) {
-        res.json({ result:true,userFrom, userTo })
+    if (modifCount === 2) {
+        res.json({ result: true, userFrom, userTo })
+    }
+    else {
+        res.json({ result: false, modifCount })
     }
 
-    // User.updateOne({ token: token }, { $push: { 'friends.outcoming': friendTo } })
-    //     .then(data1 => {
-    //         if (data1.matchedCount > 0) {
-    //             User.updateOne({ _id: friendTo }, { $push: { 'friends.incoming': friendFrom } })
-    //                 .then(data2 => {
-    //                     if (data2.matchedCount > 0) {
-    //                         res.json({ result: true, data: { data1, data2 } })
-    //                     }
-    //                     else { res.json({ result: false, error: 'unable to update user TO' }) }
-    //                 })
-    //                 .catch(error => { res.json({ error: error }) })
-    //         }
-    //         else { res.json({ result: false, error: 'unable to update user FROM' }) }
-    //     })
-    //     .catch(error => { res.json({ error: error }) })
+
 })
 
 module.exports = router;
