@@ -93,7 +93,7 @@
   <h4 class="done">Liste des lieux (optional query:longitude, latitude, longitudeDelta, latitudeDelta)</h4>
   <h4 class="done">response : { result : boolean }</h4>
   <hr />
-  
+
   <h2 class="done">POST /places</h2>
   <h4 class="done">req.body : { name, houseNumber, street, postcode, city, longitude, latitude, description, type }</h4>
   <h4 class="done">Ajout d'un nouveau lieu</h4>
@@ -113,23 +113,41 @@
   <h4 class="done">Liste des amis de l'user token</h4>
   <h4 class="done">response : { result : boolean, data: {accepted:[],incoming:[],outcoming:[],blocked:[]} }</h4>
   <hr />
-  
-  <h2 class="done">POST /friends/outcomming // updateOne ne fonctionne pas</h2>
-  <h4 class="todo">params id = token, req.body = {friendFrom, friendTo} (mongodb_ids)</h4>
-  <h4 class="todo">Envoi d'une demande d'ami</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+
+  <h2 class="done">GET /friends/id/incomming</h2>
+  <h4 class="done">params id = token</h4>
+  <h4 class="done">Liste des demandes reçues</h4>
+  <h4 class="done">response : { result : boolean, incoming: [] }</h4>
   <hr />
   
-  <h2 class="todo">GET /friends/outcomming</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Liste des demandes envoyées</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">GET /friends/id/outcomming</h2>
+  <h4 class="done">params id = token</h4>
+  <h4 class="done">Liste des demandes envoyées</h4>
+  <h4 class="done">response : { result : boolean, outcoming: [] }</h4>
   <hr />
   
-  <h2 class="todo">GET /friends/incomming</h2>
-  <h4 class="todo">params</h4>
-  <h4 class="todo">Liste des demandes reçues</h4>
-  <h4 class="todo">response : { result : boolean, data: data }</h4>
+  <h2 class="done">POST /friends/id/outcomming</h2>
+  <h4 class="done">params id = token, req.body = {friendFrom, friendTo} (mongodb_ids)</h4>
+  <h4 class="done">Envoyer une demande d'ami</h4>
+  <h4 class="done">response : { result : boolean, userFromFriends, userToFriends }</h4>
+  <hr />
+
+  <h2 class="done">PUT /friends/id/outcoming</h2>
+  <h4 class="done">params id = token, req.body : { friendTo:_id }</h4>
+  <h4 class="done">Annuler l'envoi d'une demande</h4>
+  <h4 class="done">response : { result : boolean, userFromFriends, userToFriends }</h4>
+  <hr />
+
+  <h2 class="done">PUT /friends/id/incomming</h2>
+  <h4 class="done">params id = token, req.body : { friendFrom:_id, accept:yes|no }</h4>
+  <h4 class="done">Accepter ou refuser une demande</h4>
+  <h4 class="done">response : { result : boolean, userFromFriends, userToFriends }</h4>
+  <hr />
+  
+  <h2 class="done">DELETE /friends/id</h2>
+  <h4 class="done">params id = token, req.body : { friendToDelete:_id }</h4>
+  <h4 class="done">Supprimer un ami</h4>
+  <h4 class="done">response : { result : boolean, userFriends, userToDeleteFriends }</h4>
   <hr />
 
   <h2 class="todo">POST /friends/block</h2>
@@ -149,14 +167,14 @@
   <h4 class="done">génère le nombre de chien voulu dans la bdd</h4>
   <h4 class="done">response : {"status": "xxx dogs created in bdd"}</h4>
   <hr />
-  
+
   <h2 class="done">GET /generatedata/users/:nbUsers</h2>
   <h4 class="done">nbUsers : nombre d'utilisateurs à générer</h4>
   <h4 class="done">génère le nombre d'utilisiateurs voulu dans la bdd</h4>
   <h4 class="done">response : {"status": "xxx users created in bdd"}</h4>
   <hr />
 
-  
+
 </body>
 
 </html>
