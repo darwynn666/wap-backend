@@ -37,15 +37,21 @@
   <hr />
 
   <h2 class="done">POST /users/checkmail</h2>
-  <h4 class="done">param email</h4>
+  <h4 class="done">param req.body : { email }</h4>
   <h4 class="done">Vérifie l'existence d'un mail avant le sign up</h4>
   <h4 class="done">response : { result : boolean }</h4>
   <hr />
 
   <h2 class="done">PUT /users/id</h2>
-  <h4 class="done">id = token + params req.body</h4>
+  <h4 class="done">id = token , req.body</h4>
   <h4 class="done">Modification d'un utilisateur</h4>
   <h4 class="done">response : { result : boolean, data: data }</h4>
+  <hr />
+
+  <h2 class="todo">PUT /users/id/photo</h2>
+  <h4 class="todo">id = token , req.body : { formData } // nom de la photo : 'userPhoto'</h4>
+  <h4 class="todo">Modification de la photo d'un utilisateur</h4>
+  <h4 class="todo">response : { result : boolean, data: userDatas }</h4>
   <hr />
 
   <h2 class="todo">DELETE /users/id</h2>
@@ -84,6 +90,12 @@
   <h4 class="done">params id = user_token , req.body { _id: dog_id, status: string , isTaken:boolean }</h4>
   <h4 class="done">Mise a jour du status du chien</h4>
   <h4 class="done">response : { result : boolean, dog }</h4>
+  <hr />
+
+  <h2 class="todo">PUT /dogs/id/photo</h2>
+  <h4 class="todo">id = token , req.body : { ... }</h4>
+  <h4 class="todo">Modification de la photo d'un chien</h4>
+  <h4 class="todo">response : { result : boolean, dog }</h4>
   <hr />
 
   <h2 class="done">DELETE /dogs/id</h2>

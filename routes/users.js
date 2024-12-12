@@ -8,6 +8,7 @@ const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
+const uniqid = require('uniqid')
 
 // POST /users/signup : sign up
 router.post('/signup', (req, res) => {
@@ -179,6 +180,20 @@ router.put('/:id/status', (req, res) => {
     })
 })
 
+
+// PUT /users/id/photo : update users photo
+router.put('/:token/photo', async (req, res) => {
+  const token = req.params.token
+  const photo = req.files.userPhoto
+  const photoPath = `../tmp/${uniqid()}.jpg`
+  const resultMove = await photo.mv(photoPath)
+
+  if (!resultMove) {
+
+    res.json({ result: true });
+  }
+  else { res.json({ result: false, error: resultMove }) }
+})
 
 
 module.exports = router;
