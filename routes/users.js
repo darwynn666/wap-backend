@@ -113,19 +113,41 @@ router.get('/', (req, res) => {
 })
 
 
-// GET unique user
-router.get('/:token', (req, res) => {
+// GET /users/id : get unique user by his id
+router.get('/:id', (req, res) => {
+  const id = req.params.id
+
+  User.findById(id, { password: 0, token: 0, friends: 0 })
+    .populate('infos')
+    .populate('dogs')
+    .then(data => {
+      if (data) {
+        res.json({ result: true, data: data })
+      }
+      else {
+        res.json({ result: false, error: `Id not found : ${id}` })
+      }
+    })
+    .catch(error => { res.json({ result: false, error }); return })
+})
+
+// GET /users/me/token : get connected user by his token
+router.get('/me/:token', (req, res) => {
   const token = req.params.token
 
-  User.findOne({ token: token }).then(data => {
-    if (data) {
-      res.json({ result: true, data: data })
-    }
-    else {
-      res.json({ result: false, error: `Token not found : ${token}` })
-    }
-  })
-
+  User.findOne({ token: token }, { password: 0 })
+    .populate('infos')
+    .populate('dogs')
+    .populate('friends')
+    .then(data => {
+      if (data) {
+        res.json({ result: true, data: data })
+      }
+      else {
+        res.json({ result: false, error: `Token not found : ${token}` })
+      }
+    })
+    .catch(error => { res.json({ result: false, error }); return })
 })
 
 

@@ -37,6 +37,8 @@ router.post('/', (req, res) => {
 
 });
 
+
+// GET /places
 router.get('/', (req, res) => {
 
   const longitude = parseFloat(req.query.longitude)
