@@ -5,10 +5,15 @@ const User = require('./models/users')
 
 beforeEach (async () =>await User.findOne())
 it('POST /generatedata/users', async () => {
- const res = await request(app).post(' /generatedata/users');
-
+ const res = await request(app).post('/generatedata/users');
  expect(res.statusCode).toBe(200);
-//  expect(res.body.stock).toEqual(['iPhone', 'iPad', 'iPod']);
 });
 
-afterAll( async() => {mongoose.connection.close})
+it('POST /generatedata/users', async () => {
+    const res = await request(app).post('/generatedata/users');
+    expect(res.body.result).toBe("test");  
+   });
+
+afterAll( async() => {mongoose.connection.close()
+    done()
+})
