@@ -51,6 +51,7 @@ router.post('/checkmail', (req, res) => {
   });
 });
 
+
 // POST /users/signin : sign in
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['email', 'password'])) {
@@ -59,14 +60,14 @@ router.post('/signin', (req, res) => {
   }
 
   User.findOne({ "infos.email": req.body.email })
-  .populate('dogs')
-  .then(data => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, data: data });
-    } else {
-      res.json({ result: false, error: 'User not found or wrong password' });
-    }
-  });
+    .populate('dogs')
+    .then(data => {
+      if (data && bcrypt.compareSync(req.body.password, data.password)) {
+        res.json({ result: true, data: data });
+      } else {
+        res.json({ result: false, error: 'User not found or wrong password' });
+      }
+    });
 });
 
 
@@ -217,6 +218,29 @@ router.put('/:token/photo', async (req, res) => {
     res.json({ result: true });
   }
   else { res.json({ result: false, error: resultMove }) }
+})
+
+// PUT /users/id/newdog
+router.post('/:token/newdog', (req, res) => {
+  const token = req.params.token
+  const { dogId } = req.body
+  if (!dogId) { res.json({ result: false, error: 'required dog_id' }) }
+
+  User.findOne({ token: token }).then(user => {
+    if (user) {
+      const myDogs = user.dogs
+      if (myDogs.includes(dogId)) { res.json({ result: false, error: 'user already owns this dog' }); return }
+      else {
+        myDogs.push(dogId)
+        User.updateOne({ token: token }, { $set: { dogs: myDogs } }).then(() => { res.json({ result: true, data: myDogs }) })
+          .catch(error => { res.json({ result: false, error }); return })
+      }
+    }
+    else { res.json({ result: false, error: 'user doesnt exists' }) }
+  })
+    .catch(error => { res.json({ result: false, error }); return })
+
+
 })
 
 

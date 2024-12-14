@@ -59,17 +59,23 @@
   <h4 class="todo">Modification de la photo d'un utilisateur</h4>
   <h4 class="todo">response : { result : boolean, data: userDatas }</h4>
   <hr />
-
+  
   <h2 class="todo">DELETE /users/id</h2>
   <h4 class="todo">id = token</h4>
   <h4 class="todo">Delete d'un utilisateur</h4>
   <h4 class="todo">response : { result : boolean, data: data }</h4>
   <hr />
-
+  
   <h2 class="done">PUT /users/id/status</h2>
   <h4 class="done">id = token</h4>
   <h4 class="done">Met a jours le status utilisateur (home, walk, pause)</h4>
   <h4 class="done">response : { result : boolean, data: data }</h4>
+  <hr />
+  
+  <h2 class="done">PUT /users/id/newdog</h2>
+  <h4 class="done">id = token , req.body : { dog_id }</h4>
+  <h4 class="done">Add a dog in users dogs list</h4>
+  <h4 class="done">response : { result : boolean, data: userDogs }</h4>
   <hr />
 
   <!-- /dogs -->
