@@ -140,7 +140,7 @@ router.get('/me/:token', (req, res) => {
 
   User.findOne({ token: token }, { password: 0 })
     .populate('infos')
-    .populate('dogs')
+    // .populate('dogs')
     .populate('friends')
     .then(data => {
       if (data) {
@@ -220,7 +220,7 @@ router.put('/:token/photo', async (req, res) => {
   else { res.json({ result: false, error: resultMove }) }
 })
 
-// PUT /users/id/newdog
+// PUT /users/id/newdog : update users dogs list
 router.put('/:token/newdog', (req, res) => {
   const token = req.params.token
   const { dogId } = req.body
