@@ -221,7 +221,7 @@ router.put('/:token/photo', async (req, res) => {
 })
 
 // PUT /users/id/newdog
-router.post('/:token/newdog', (req, res) => {
+router.put('/:token/newdog', (req, res) => {
   const token = req.params.token
   const { dogId } = req.body
   if (!dogId) { res.json({ result: false, error: 'required dog_id' }) }
