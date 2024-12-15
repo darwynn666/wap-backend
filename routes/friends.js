@@ -15,9 +15,8 @@ router.get('/', (req, res) => {
 router.get('/:token', (req, res) => {
     const token = req.params.token
     User.findOne({ token: token })
-        // .populate('friends')
         .then(user => {
-            // console.log(user.friends)
+            console.log(user.friends)
             if (user) { res.json({ result: true, data: user.friends }) }
             else { res.json({ result: false, error: 'No user found, bad token' }) }
         })
@@ -44,7 +43,7 @@ router.get('/:token/outcoming', (req, res) => {
 })
 
 
-// POST /friend/id/outcoming, send a demand to a friend ////////////////// AJOUTER VERIF SI PAS DEJA AMI
+// POST /friend/id/outcoming, send a demand to a friend // AJOUTER VERIF SI FRIEND TO PAS BLOQUE
 router.post('/:token/outcoming', async (req, res) => {
     const token = req.params.token
     const { friendFrom, friendTo } = req.body
@@ -101,6 +100,7 @@ router.put('/:token/incoming', async (req, res) => {
     const hisId = userFrom._id
     const myFriends = userTo.friends
     const hisFriends = userFrom.friends
+    console.log(myFriends, hisFriends)
 
     if (!myFriends.incoming.includes(hisId) || !hisFriends.outcoming.includes(myId)) { // check if demand really exists
         res.json({ result: false, error: 'this demand doesnt exists', myFriends, hisFriends })
@@ -134,8 +134,8 @@ router.put('/:token/incoming', async (req, res) => {
 })
 
 
-// PUT /friends/id/outcoming : cancel a demand
-router.put('/:token/outcoming', async (req, res) => {
+// DELETE /friends/id/outcoming : cancel an outcoming demand
+router.delete('/:token/outcoming', async (req, res) => {
     const token = req.params.token
     const { friendTo } = req.body
     if (!friendTo) { res.json({ result: false, error: 'missing field friendTo' }) }
@@ -144,14 +144,14 @@ router.put('/:token/outcoming', async (req, res) => {
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
     if (!userFrom || !userTo) return
 
-    console.log(userTo)
-
+    
     const myId = userFrom._id
     const hisId = userTo._id
     const myFriends = userFrom.friends
     const hisFriends = userTo.friends
+    console.log(myId,userTo)
 
-    if (!myFriends.outcoming.includes(hisId) || !hisFriends.intcoming.includes(myId)) { // check if demand really exists
+    if (!myFriends.outcoming.includes(hisId) || !hisFriends.incoming.includes(myId)) { // check if demand really exists
         res.json({ result: false, error: 'this demand doesnt exists', myFriends, hisFriends })
         return
     }

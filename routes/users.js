@@ -60,10 +60,11 @@ router.post('/signin', (req, res) => {
   }
 
   User.findOne({ "infos.email": req.body.email })
-    .populate('dogs')
+    // .populate('dogs')
     .then(data => {
       if (data && bcrypt.compareSync(req.body.password, data.password)) {
         res.json({ result: true, data: data });
+        console.log(data)
       } else {
         res.json({ result: false, error: 'User not found or wrong password' });
       }
@@ -121,8 +122,7 @@ router.get('/:id', (req, res) => {
   const id = req.params.id
 
   User.findById(id, { password: 0, token: 0, friends: 0 })
-    .populate('infos')
-    .populate('dogs')
+    // .populate('dogs')
     .then(data => {
       if (data) {
         res.json({ result: true, data: data })
@@ -139,9 +139,7 @@ router.get('/me/:token', (req, res) => {
   const token = req.params.token
 
   User.findOne({ token: token }, { password: 0 })
-    .populate('infos')
     // .populate('dogs')
-    .populate('friends')
     .then(data => {
       if (data) {
         res.json({ result: true, data: data })
