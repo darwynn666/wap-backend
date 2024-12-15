@@ -28,8 +28,7 @@ router.get('/places/:nbPlaces', async (req, res) => {
 });
 
 router.post('/users', async (req, res) => {
-  res.json({result:"test"})
-  console.log("post")
+  res.json({result:true,data:[]})
  });
 
 
