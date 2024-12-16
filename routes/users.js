@@ -9,6 +9,7 @@ const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 const uniqid = require('uniqid')
+const cloudinary = require('cloudinary').v2;
 
 // POST /users/signup : sign up
 router.post('/signup', (req, res) => {
@@ -204,19 +205,6 @@ router.put('/:id/status', (req, res) => {
 })
 
 
-// PUT /users/id/photo : update users photo
-router.put('/:token/photo', async (req, res) => {
-  const token = req.params.token
-  const photo = req.files.userPhoto
-  const photoPath = `../tmp/${uniqid()}.jpg`
-  const resultMove = await photo.mv(photoPath)
-
-  if (!resultMove) {
-
-    res.json({ result: true });
-  }
-  else { res.json({ result: false, error: resultMove }) }
-})
 
 // PUT /users/id/newdog : update users dogs list
 router.put('/:token/newdog', (req, res) => {
@@ -239,6 +227,46 @@ router.put('/:token/newdog', (req, res) => {
     .catch(error => { res.json({ result: false, error }); return })
 
 
+})
+
+// PUT /users/id/photo : update users photo
+router.put('/:token/photo', async (req, res) => {
+  const token = req.params.token
+  const photo = req.files.photo
+  if (!photo) { res.json({ result: false, error: 'photo required' }); return }
+
+  const options = { folder: 'wap/users' }
+
+  // Uploader le fichier vers Cloudinary
+  const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+    if (error) {
+      console.error('Erreur Cloudinary:', error)
+      res.json({ result: false, error })
+      return
+    }
+    let old_public_id=null
+    User.findOne({ token: token })
+    .then(user => {
+      if (user) {
+          old_public_id = user.infos.photo_public_id
+          user.infos.photo = result.secure_url
+          user.infos.photo_public_id = result.public_id
+          // console.log(user)
+          return user.save()
+        }
+      })
+      .then(savedUser => {
+        if (savedUser) {
+          console.log(savedUser.infos.photo_public_id)
+          const resultDestroy = cloudinary.uploader.destroy(old_public_id)
+          console.log(resultDestroy)
+          res.json({ result: true, data: savedUser })
+        }
+      })
+  })
+
+  // Envoyer les données du fichier au stream
+  uploadStream.end(photo.data);
 })
 
 

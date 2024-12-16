@@ -25,6 +25,7 @@ const usersinfosSchema = mongoose.Schema({
     telephone: String,
     email: String,
     photo: String,
+    photo_public_id:String,
     isDogSitter: Boolean,
     isSearchingDogSitter: Boolean,
 })

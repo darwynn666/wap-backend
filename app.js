@@ -9,6 +9,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('./models/connexion');
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dogsRouter = require('./routes/dogs');
@@ -18,6 +19,8 @@ var generateDataRouter = require('./routes/generateData');
 
 var app = express();
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
 const cors = require('cors');
 app.use(cors());
 

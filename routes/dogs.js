@@ -4,6 +4,7 @@ require('../models/connexion');
 const { checkBody } = require('../modules/checkBody');
 const Dog = require('../models/dogs');
 const User = require('../models/users')
+const cloudinary = require('cloudinary').v2;
 
 
 // default
@@ -117,5 +118,45 @@ router.delete('/:token', (req, res) => {
 
 })
 
+// PUT /dogs/id/photo : update dogs photo
+router.put('/:id/photo', async (req, res) => {
+    const _id = req.params.id
+    const photo = req.files.photo
+    if (!photo) { res.json({ result: false, error: 'photo required' }); return }
+  
+    const options = { folder: 'wap/dogs' }
+  
+    // Uploader le fichier vers Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) {
+        console.error('Erreur Cloudinary:', error)
+        res.json({ result: false, error })
+        return
+      }
+      let old_public_id=null
+      Dog.findById(_id)
+      .then(dog => {
+        if (dog) {
+            old_public_id = dog.photo_public_id
+            dog.photo = result.secure_url
+            dog.photo_public_id = result.public_id
+            // console.log(dog)
+            return dog.save()
+          }
+        })
+        .then(savedDog => {
+          if (savedDog) {
+            console.log(savedDog.photo_public_id)
+            const resultDestroy = cloudinary.uploader.destroy(old_public_id)
+            // console.log(resultDestroy)
+            res.json({ result: true, data: savedDog })
+          }
+        })
+    })
+  
+    // Envoyer les données du fichier au stream
+    uploadStream.end(photo.data);
+  })
+  
 
 module.exports = router;
