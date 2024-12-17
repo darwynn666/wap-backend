@@ -6,6 +6,7 @@ const Places = require('../models/places');
 const { checkBody } = require('../modules/checkBody');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 
+// POST /places
 router.post('/', (req, res) => {
 
   if (!checkBody(req.body, ['name', 'houseNumber', 'street', 'postcode', 'city', 'longitude', 'latitude', 'description', 'type'])) {
@@ -68,7 +69,6 @@ router.get('/', (req, res) => {
     }
   }
 
-
   Places.find(placesQuery).then(data => {
     if (data) {
       console.log('places: ', data.length)
@@ -79,5 +79,21 @@ router.get('/', (req, res) => {
   })
 })
 
+// GET /places/id/users : get users of one place
+router.get('/:id/users', (req, res) => {
+  const _id = req.params.id
 
+  Places.findOne({ _id })
+    .then(place => {
+      console.log(place.users)
+      res.json({ressult:true,users:place.users})
+    })
+    .catch(error => { res.json({ error }); return })
+})
+
+
+
+//  PUT /places/id/users/user_id     : add or remove an user from a place
+// body{ user_id }
+// router.post()
 module.exports = router;

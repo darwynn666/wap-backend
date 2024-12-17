@@ -156,7 +156,7 @@ router.get('/me/:token', (req, res) => {
 // PUT /users/id      update user infos (password optional)
 router.put('/:id', (req, res) => {
   const token = req.params.id
-  const { firstname, lastname, telephone, email, isDogSitter, isSearchingDogSitter, password } = req.body
+  const { firstname, lastname, telephone, email, isDogSitter, isSearchingDogSitter, password, photo, photo_public_id } = req.body
 
   if ((!firstname || !lastname || !telephone || !email) || (typeof isDogSitter !== 'boolean' || typeof isSearchingDogSitter !== 'boolean')) { // check body
     res.json({ result: false, error: 'Invalid form data' })
@@ -170,7 +170,7 @@ router.put('/:id', (req, res) => {
   }
 
 
-  User.updateOne({ token: token }, { $set: { infos: { firstname, lastname, telephone, email, isDogSitter, isSearchingDogSitter } } })
+  User.updateOne({ token: token }, { $set: { 'infos.firstname': firstname, 'infos.lastname': lastname, 'infos.telephone': telephone, 'infos.email': email, 'infos.isDogSitter': isDogSitter, 'infos.isSearchingDogSitter': isSearchingDogSitter } })
     .then(data => {
       console.log(data)
       if (data.matchedCount > 0) { res.json({ result: true, data: data }) }
@@ -244,10 +244,10 @@ router.put('/:token/photo', async (req, res) => {
       res.json({ result: false, error })
       return
     }
-    let old_public_id=null
+    let old_public_id = null
     User.findOne({ token: token })
-    .then(user => {
-      if (user) {
+      .then(user => {
+        if (user) {
           old_public_id = user.infos.photo_public_id
           user.infos.photo = result.secure_url
           user.infos.photo_public_id = result.public_id
