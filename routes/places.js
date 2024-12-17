@@ -86,14 +86,33 @@ router.get('/:id/users', (req, res) => {
   Places.findOne({ _id })
     .then(place => {
       console.log(place.users)
-      res.json({ressult:true,users:place.users})
+      res.json({ ressult: true, users: place.users })
     })
     .catch(error => { res.json({ error }); return })
 })
 
 
 
-//  PUT /places/id/users/user_id     : add or remove an user from a place
+//  PUT /places/id/users/user_id : add or remove (toggle) an user from a place
 // body{ user_id }
-// router.post()
+router.put('/:place_id/users/:user_id', async (req, res) => {
+  const { place_id, user_id } = req.params
+
+  // get users
+  const place = await Places.findOne({ _id: place_id })
+  console.log(place)
+  if (place.users) {
+    if (place.users.includes(user_id)) { place.users = place.users.filter(e => e != user_id) }
+    else { place.users.push(user_id) }
+    //update bdd
+    response = await Places.updateOne({ _id: place_id }, { $set: { users: place.users } })
+    console.log(response)
+    res.json({result:true,users:place.users})
+  }
+  else {
+    res.json({ result: false, error: 'place not found' })
+  }
+
+
+})
 module.exports = router;
