@@ -123,7 +123,7 @@ router.get('/:id', (req, res) => {
   const id = req.params.id
 
   User.findById(id, { password: 0, token: 0, friends: 0 })
-    // .populate('dogs')
+    .populate('dogs')
     .then(data => {
       if (data) {
         res.json({ result: true, data: data })
