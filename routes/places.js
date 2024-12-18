@@ -5,38 +5,97 @@ require('../models/connexion');
 const Places = require('../models/places');
 const { checkBody } = require('../modules/checkBody');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
+const cloudinary = require('cloudinary').v2;
 
-// POST /places
+// POST /places : add a place EXCEPT description and photo
 router.post('/', (req, res) => {
 
-  if (!checkBody(req.body, ['name', 'houseNumber', 'street', 'postcode', 'city', 'longitude', 'latitude', 'description', 'type'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
-    return;
+  const { name, type, longitude, latitude, housenumber, street, postcode, city } = req.body
+
+
+  if (!checkBody(req.body, ['name', 'housenumber', 'street', 'postcode', 'city', 'longitude', 'latitude', 'type'])) {
+    res.json({ result: false, error: 'Missing or empty fields' })
+    return
   }
 
   const newPlace = new Places({
-    name: req.body.name,
-    houseNumber: req.body.houseNumber,
-    street: req.body.street,
-    postcode: req.body.postcode,
-    city: req.body.city,
-    description: req.body.description,
-    type: req.body.type,
+    name: name,
+    houseNumber: housenumber,
+    street: street,
+    postcode: postcode,
+    city: city,
+    type: type,
     isFake: false,
     photo: '',
+    description: '',
     users: [],
-    location: { type: 'Point', coordinates: [req.body.longitude, req.body.latitude] }
-  });
+    location: { type: 'Point', coordinates: [longitude, latitude] }
+  })
 
   console.log(newPlace)
-  // res.json({ result: true })
 
   newPlace.save().then(() => {
-    res.json({ result: true })
-    // console.log(newPlace);
-  });
+    res.json({ result: true, place: newPlace })
+  })
 
-});
+})
+
+// PUT /places/id/step2 : update photo and description (final step for a new place)
+router.put('/:id/step2', (req, res) => {
+  const _id = req.params.id
+  const description = req.body.description
+
+  Places.updateOne({ _id: _id }, { $set: { description } }).then(data => {
+    console.log(data)
+    res.json({ result: true, data })
+  })
+})
+
+// PUT /places/id/photo : update place's photo
+router.put('/:id/photo', (req, res) => {
+  console.log('route put')
+  const _id = req.params.id
+  const photo = req.files.photo
+  if (!photo) { res.json({ result: false, error: 'photo required' }); return }
+
+  const options = { folder: 'wap/places' }
+
+  // Uploader le fichier vers Cloudinary
+  const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+    if (error) {
+      console.error('Erreur Cloudinary:', error)
+      res.json({ result: false, error })
+      return
+    }
+    let old_public_id = null
+    Places.findById(_id)
+      .then(place => {
+        if (place) {
+          old_public_id = place.photo_public_id
+          place.photo = result.secure_url
+          place.photo_public_id = result.public_id
+          // console.log(place)
+          return place.save()
+        }
+      })
+      .then(savedPlace => {
+        if (savedPlace) {
+          console.log(savedPlace.photo_public_id)
+          const resultDestroy = cloudinary.uploader.destroy(old_public_id)
+          // console.log(resultDestroy)
+          res.json({ result: true, data: savedPlace })
+        }
+      })
+  })
+
+  // Envoyer les données du fichier au stream
+  uploadStream.end(photo.data);
+})
+
+// PUT /place/id : update a place
+
+
+
 
 
 // GET /places : get all lplaces
@@ -117,10 +176,6 @@ router.get('/near/:longitude/:latitude/:distance', (req, res) => {
     .catch(error => { res.json({ result: false, error }); return })
 })
 
-
-
-
-
 // GET /places/id/users : get users of one place
 router.get('/:id/users', (req, res) => {
   const _id = req.params.id
@@ -132,7 +187,6 @@ router.get('/:id/users', (req, res) => {
     })
     .catch(error => { res.json({ error }); return })
 })
-
 
 //  PUT /places/id/users/user_id : add or remove (toggle) an user from a place
 // body{ user_id }

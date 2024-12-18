@@ -15,6 +15,7 @@ const mongoose = require('mongoose');
 const placesSchema = mongoose.Schema({
     name: String,
     photo: String,
+    photo_public_url:String,
     houseNumber: String,
     street: String,
     postcode: Number,
