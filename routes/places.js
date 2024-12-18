@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
 });
 
 
-// GET /places
+// GET /places : get all lplaces
 router.get('/', (req, res) => {
 
   const longitude = parseFloat(req.query.longitude)
@@ -79,6 +79,48 @@ router.get('/', (req, res) => {
   })
 })
 
+// GET /places/near/longitude/latitude/distance : get all places near given coordinates
+router.get('/near/:longitude/:latitude/:distance', (req, res) => {
+  const { longitude, latitude, distance } = req.params
+  if (!longitude || !latitude || !distance) {
+    res.json({ result: false, error: 'required params : GET /places/near/longitude/latitude/distance' })
+    return
+  }
+  if (isNaN(Number(longitude)) || isNaN(Number(latitude)) || isNaN(Number(distance))) {
+    res.json({ result: false, error: 'must be numbers : { longitude, latitude, distance }' })
+    return
+  }
+
+  console.log(req.params)
+  const location = { type: "Point", coordinates: [longitude, latitude] }
+
+
+  const placeQuery = {
+    location: {
+      $near: {
+        $geometry: location,
+        $minDistance: 0,
+        $maxDistance: distance,
+      }
+    }
+  }
+
+  Places.find(placeQuery).then(places => {
+    if (places) {
+      console.log('places', places.length)
+      res.json({ result: true, places: places })
+    }
+    else {
+      res.json({ result: false, error: 'no place found' })
+    }
+  })
+    .catch(error => { res.json({ result: false, error }); return })
+})
+
+
+
+
+
 // GET /places/id/users : get users of one place
 router.get('/:id/users', (req, res) => {
   const _id = req.params.id
@@ -90,7 +132,6 @@ router.get('/:id/users', (req, res) => {
     })
     .catch(error => { res.json({ error }); return })
 })
-
 
 
 //  PUT /places/id/users/user_id : add or remove (toggle) an user from a place
@@ -107,7 +148,7 @@ router.put('/:place_id/users/:user_id', async (req, res) => {
     //update bdd
     response = await Places.updateOne({ _id: place_id }, { $set: { users: place.users } })
     console.log(response)
-    res.json({result:true,users:place.users})
+    res.json({ result: true, users: place.users })
   }
   else {
     res.json({ result: false, error: 'place not found' })
@@ -115,4 +156,7 @@ router.put('/:place_id/users/:user_id', async (req, res) => {
 
 
 })
+
+
+
 module.exports = router;
