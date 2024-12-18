@@ -191,8 +191,8 @@ router.put('/:id/status', (req, res) => {
 
   User.updateOne({ token: token }, { $set: { status } })
     .then(data => {
-      console.log(data)
-      if (matchedCount > 0) {
+      // console.log(data)
+      if (data.matchedCount > 0) {
         res.json({ result: true, data: data })
       }
       else {
