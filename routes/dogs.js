@@ -25,24 +25,26 @@ router.get('/:token', (req, res) => {
 
 // POST /dogs : add a new dog, returns the new dog
 router.post('/', (req, res) => {
-    const { name, sex } = req.body
+    const { name, sex, race, birthday, chipid } = req.body
     if (!name || !sex) {
         res.json({ result: false, error: 'Missing or empty fields' });
         return;
     }
     const newDog = new Dog({
-        name: req.body.name,
-        sex: req.body.sex,
+        name: name,
+        sex: sex,
+        race: race || '',
+        birthday: birthday || '',
+        chipid: chipid || '',
         isTaken: false,
         isFake: false,
     });
-
     newDog.save().then(() => {
         res.json({ result: true, data: newDog })
     })
 })
 
-// PUT /dogs/id : update a dog (infos), returns boolean
+// PUT /dogs/id : update a dog (infos)
 router.put('/:token', (req, res) => {
     const token = req.params.token
     const { _id, name, sex, race, birthday, chipid } = req.body
@@ -65,7 +67,7 @@ router.put('/:token', (req, res) => {
         .catch(error => { res.json({ result: false, error }); return })
 })
 
-// PUT /dogs/id/status : update dog's status and isTaken    //    VERIF TOKEN CHECK IF IS MY DOG
+// PUT /dogs/id/status : update dog's status and isTaken  
 router.put('/:token/status', (req, res) => {
     const token = req.params.token
     const { _id, status, isTaken } = req.body
@@ -123,40 +125,40 @@ router.put('/:id/photo', async (req, res) => {
     const _id = req.params.id
     const photo = req.files.photo
     if (!photo) { res.json({ result: false, error: 'photo required' }); return }
-  
+
     const options = { folder: 'wap/dogs' }
-  
+
     // Uploader le fichier vers Cloudinary
     const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error) {
-        console.error('Erreur Cloudinary:', error)
-        res.json({ result: false, error })
-        return
-      }
-      let old_public_id=null
-      Dog.findById(_id)
-      .then(dog => {
-        if (dog) {
-            old_public_id = dog.photo_public_id
-            dog.photo = result.secure_url
-            dog.photo_public_id = result.public_id
-            // console.log(dog)
-            return dog.save()
-          }
-        })
-        .then(savedDog => {
-          if (savedDog) {
-            console.log(savedDog.photo_public_id)
-            const resultDestroy = cloudinary.uploader.destroy(old_public_id)
-            // console.log(resultDestroy)
-            res.json({ result: true, data: savedDog })
-          }
-        })
+        if (error) {
+            console.error('Erreur Cloudinary:', error)
+            res.json({ result: false, error })
+            return
+        }
+        let old_public_id = null
+        Dog.findById(_id)
+            .then(dog => {
+                if (dog) {
+                    old_public_id = dog.photo_public_id
+                    dog.photo = result.secure_url
+                    dog.photo_public_id = result.public_id
+                    // console.log(dog)
+                    return dog.save()
+                }
+            })
+            .then(savedDog => {
+                if (savedDog) {
+                    console.log(savedDog.photo_public_id)
+                    const resultDestroy = cloudinary.uploader.destroy(old_public_id)
+                    // console.log(resultDestroy)
+                    res.json({ result: true, data: savedDog })
+                }
+            })
     })
-  
+
     // Envoyer les données du fichier au stream
     uploadStream.end(photo.data);
-  })
-  
+})
+
 
 module.exports = router;

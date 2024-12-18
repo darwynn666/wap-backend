@@ -269,5 +269,27 @@ router.put('/:token/photo', async (req, res) => {
   uploadStream.end(photo.data);
 })
 
-
+// PUT /users/id/coordinates : update users coordinates
+router.put('/:token/coordinates', (req, res) => {
+  const token = req.params.token
+  const { longitude, latitude } = req.body
+  if (!longitude || !latitude || isNaN(Number(longitude)) || isNaN(Number(latitude))) {
+    res.json({ result: false, error: 'Invalid params : { Number(longitude), Number(latitude) }' })
+    return
+  }
+  const currentLocation = {
+    type: 'Point',
+    coordinates: [longitude, latitude]
+  }
+  User.updateOne({ token }, { $set: { currentLocation } })
+    .then((user) => {
+      if (user.matchedCount > 0) {
+        res.json({ result: true, currentLocation })
+      }
+      else {
+        res.json({ result: false, error: 'user not found' })
+      }
+    })
+    .catch(error => { res.json({ result: false, error }) })
+})
 module.exports = router;
