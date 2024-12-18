@@ -55,8 +55,10 @@ router.post('/:token/outcoming', async (req, res) => {
 
     const myId = userFrom._id
     const hisId = userTo._id
+    const userToIsFake = userTo.isFake
     const myFriends = userFrom.friends
     const hisFriends = userTo.friends
+    const hisToken = userTo.token
 
     if (myFriends.accepted.includes(hisId) || hisFriends.accepted.includes(myId)) { // check if relation already exists
         res.json({ result: false, error: 'this relation already exists', myFriends, hisFriends })
@@ -78,7 +80,28 @@ router.post('/:token/outcoming', async (req, res) => {
         User.updateOne({ _id: hisId }, { $set: { friends: hisFriends } }).catch(error => { res.json({ result: false, error }); return })
     )
 
-    Promise.all(promises).then(() => { // execute two queries
+    Promise.all(promises).then(async () => { // execute two queries
+        // if fake user automate the response
+        if (userToIsFake)
+        {
+            const delay = 15000 //5 secondes
+
+
+            setTimeout(async () => {
+                //get the server url
+                const baseUrl = `${req.protocol}://${req.get('host')}`;
+                console.log(baseUrl)
+                const response = await fetch(`${baseUrl}/friends/${hisToken}/incoming`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-type': 'application/json'
+                       },
+                   body: JSON.stringify({friendFrom:myId,accept:true}) 
+                }); 
+            }, delay);
+        }
+            
+
         res.json({ result: true, userFromFriends: userFrom.friends, userToFriends: userTo.friends })
     })
         .catch(error => { res.json({ result: false, error }) }); return
