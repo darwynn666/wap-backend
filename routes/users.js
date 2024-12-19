@@ -12,7 +12,7 @@ const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
 
 // POST /users/signup : sign up
-router.post("/signup", (req, res) => {
+router.post("/signup", async (req, res) => {
   const { firstname, lastname, email, telephone, password, dogs } = req.body;
   if (!firstname || !lastname || !email || !telephone || !password) {
     // check body
@@ -20,13 +20,12 @@ router.post("/signup", (req, res) => {
     return;
   }
 
-  User.findOne({ "infos.email": req.body.email }).then((data) => {
-    // Check if the user has not already been registered
-    if (data) {
-      res.json({ result: false, error: "User already exists" });
-    }
+  const requestFindMail = await User.findOne({ "infos.email": req.body.email });
+  const reponseFindMail = await requestFindMail;
+  if (reponseFindMail) {
+    res.json({ result: false, error: "User already exists" });
     return;
-  });
+  }
 
   const hash = bcrypt.hashSync(req.body.password, 10);
   const _newUser = {
@@ -42,12 +41,16 @@ router.post("/signup", (req, res) => {
 
   const newUser = new User(_newUser);
 
-  newUser.save().then((newDoc) => {
-    //remove password
-    delete _newUser.password;
-    res.json({ result: true, data: _newUser });
-  });
-  //   .catch(error => { res.json({ result: false, error: error }) })
+  newUser
+    .save()
+    .then((newDoc) => {
+      //remove password
+      delete _newUser.password;
+      res.json({ result: true, data: _newUser });
+    })
+    .catch((error) => {
+      res.json({ result: false, error: error });
+    });
 });
 
 // POST /users/checkmail : check if email exists before sign up
