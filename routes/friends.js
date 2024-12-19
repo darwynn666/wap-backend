@@ -16,7 +16,7 @@ router.get('/:token', (req, res) => {
     const token = req.params.token
     User.findOne({ token: token })
         .then(user => {
-            console.log(user.friends)
+            // console.log(user.friends)
             if (user) { res.json({ result: true, data: user.friends }) }
             else { res.json({ result: false, error: 'No user found, bad token' }) }
         })
