@@ -117,7 +117,7 @@ router.get("/", (req, res) => {
     };
   }
 
-  User.find(usersQuery, { _id: 1, currentLocation: 1 }).then((data) => {
+  User.find(usersQuery, { _id: 1, currentLocation: 1,status:1 }).then((data) => {
     if (data) {
       console.log("users", data.length);
       res.json({ result: true, data: data });
