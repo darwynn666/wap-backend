@@ -84,7 +84,7 @@ router.post('/:token/outcoming', async (req, res) => {
         // if fake user automate the response
         if (userToIsFake)
         {
-            const delay = 10000 // in ms
+            const delay = 5000 // in ms
 
 
             setTimeout(async () => {
