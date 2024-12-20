@@ -6,9 +6,19 @@ const Dog = require('../models/dogs');
 const User = require('../models/users')
 
 
-// default
-router.get('/', (req, res) => {
-    res.json({ message: 'test route' })
+// reset (for dev) : reset all friend relation
+router.get('/reset', (req, res) => {
+    console.log('reset all friends')
+    const friends = {
+        accepted: [],
+        incoming: [],
+        outcoming: [],
+        blocked: [],
+    }
+    User.updateMany({}, { $set: { friends: friends } }).then(data => {
+        res.json({ data })
+    })
+        .catch(error => { res.json({ error }) })
 })
 
 // GET /friends/id returns user's friends
@@ -82,8 +92,7 @@ router.post('/:token/outcoming', async (req, res) => {
 
     Promise.all(promises).then(async () => { // execute two queries
         // if fake user automate the response
-        if (userToIsFake)
-        {
+        if (userToIsFake) {
             const delay = 5000 // in ms
 
 
@@ -95,12 +104,12 @@ router.post('/:token/outcoming', async (req, res) => {
                     method: 'PUT',
                     headers: {
                         'Content-type': 'application/json'
-                       },
-                   body: JSON.stringify({friendFrom:myId,accept:true}) 
-                }); 
+                    },
+                    body: JSON.stringify({ friendFrom: myId, accept: true })
+                });
             }, delay);
         }
-            
+
 
         res.json({ result: true, userFromFriends: userFrom.friends, userToFriends: userTo.friends })
     })
@@ -167,12 +176,12 @@ router.delete('/:token/outcoming', async (req, res) => {
     const userTo = await User.findById(friendTo).catch(error => { res.json({ result: false, error }) }) // the friend
     if (!userFrom || !userTo) return
 
-    
+
     const myId = userFrom._id
     const hisId = userTo._id
     const myFriends = userFrom.friends
     const hisFriends = userTo.friends
-    console.log(myId,userTo)
+    console.log(myId, userTo)
 
     if (!myFriends.outcoming.includes(hisId) || !hisFriends.incoming.includes(myId)) { // check if demand really exists
         res.json({ result: false, error: 'this demand doesnt exists', myFriends, hisFriends })

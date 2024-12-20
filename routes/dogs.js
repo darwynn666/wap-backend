@@ -7,15 +7,12 @@ const User = require('../models/users')
 const cloudinary = require('cloudinary').v2;
 
 
-// default
-router.get('/testroute', (req, res) => {
-    // User.updateMany({ isFake: true }, { $set: { status: 'walk' } }).then(data => {
-    //     res.json({ data })
-
-    // })
-    //     .catch(error => { res.json({ error }) })
-
-
+// reset (for dev) : delete all true dogs
+router.get('/reset', (req, res) => {
+    Dog.deleteMany({ isFake: false }).then(data => {
+        res.json({ data })
+    })
+        .catch(error => { res.json({ error }) })
 })
 
 // GET /dogs/id : get user's dogs array

@@ -11,6 +11,17 @@ const { convertRegionToMeters } = require("../modules/convertRegionToMeters");
 const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
 
+
+// reset (for dev) : delete all true dogs
+router.get('/reset', (req, res) => {
+  User.deleteMany({ isFake: false }).then(data => {
+      res.json({ data })
+  })
+      .catch(error => { res.json({ error }) })
+})
+
+
+
 // POST /users/signup : sign up
 router.post("/signup", async (req, res) => {
   const { firstname, lastname, email, telephone, password, dogs } = req.body;
