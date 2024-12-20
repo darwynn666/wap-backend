@@ -7,6 +7,15 @@ const { checkBody } = require('../modules/checkBody');
 const { convertRegionToMeters } = require('../modules/convertRegionToMeters')
 const cloudinary = require('cloudinary').v2;
 
+// reset (for dev) : reset all places
+router.get('/reset', (req, res) => {
+  Places.deleteMany({ isFake: false }).then(data => {
+    res.json({ data })
+})
+    .catch(error => { res.json({ error }) })
+})
+
+
 // POST /places : add a place EXCEPT description and photo
 router.post('/', (req, res) => {
 
