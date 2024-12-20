@@ -8,8 +8,14 @@ const cloudinary = require('cloudinary').v2;
 
 
 // default
-router.get('/', (req, res) => {
-    res.json({ message: 'test route' })
+router.get('/testroute', (req, res) => {
+    // User.updateMany({ isFake: true }, { $set: { status: 'walk' } }).then(data => {
+    //     res.json({ data })
+
+    // })
+    //     .catch(error => { res.json({ error }) })
+
+
 })
 
 // GET /dogs/id : get user's dogs array
